@@ -1,0 +1,140 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'com.github.maiflai:gradle-scalatest:0.14'
+        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
+        classpath 'net.researchgate:gradle-release:2.3.4'
+    }
+}
+
+
+
+
+allprojects {
+    group = 'com.landoop'
+    version = version
+    description = "Library generating data for Lenses demo"
+
+    apply plugin: 'scala'
+    apply plugin: 'application'
+    apply plugin: 'distribution'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    ext {
+        scalaMajorVersion = '2.11'
+        scala = '2.11.8'
+        scalaCheck = '1.11.1'
+        scalaLoggingVersion = '2.1.2'
+        mockitoVersion = '2.7.13'
+        slf4jVersion = "1.7.7"
+        kafkaVersion = '0.11.0.1'
+        avro4sVersion = "1.8.0"
+        confluentVersion = "3.3.0"
+        kafkaTesting = "0.1"
+        jacksonVersion = "2.9.1"
+        jodaVersion = "2.9.9"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://packages.confluent.io/maven/" }
+        maven { url "http://repo.typesafe.com/typesafe/releases/" }
+    }
+
+    configurations {
+        provided
+        compile.extendsFrom provided
+    }
+
+    dependencies {
+        compile "org.scala-lang:scala-library:$scala"
+        compile "com.typesafe.scala-logging:scala-logging-slf4j_$scalaMajorVersion:$scalaLoggingVersion"
+        compile "org.apache.kafka:kafka-clients:$kafkaVersion"
+        //compile "org.apache.kafka:kafka_$scalaMajorVersion:$kafkaVersion"
+        compile "io.confluent:kafka-avro-serializer:$confluentVersion"
+        compile "com.sksamuel.avro4s:avro4s-core_2.11:$avro4sVersion"
+        provided "joda-time:joda-time:$jodaVersion"
+
+        compile("com.typesafe:config:1.2.1")
+
+        compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+        compile "com.fasterxml.jackson.module:jackson-module-scala_$scalaMajorVersion:$jacksonVersion"
+
+    }
+
+
+    mainClassName = "com.landoop.data.generator.Program"
+
+    jar {
+        manifest {
+            attributes(
+                    'Main-Class': 'com.landoop.data.generator.Program'
+            )
+        }
+
+        //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+
+    distributions {
+        main {
+            contents {
+                from('.') {
+                    include 'lenses.conf'
+                }
+            }
+        }
+    }
+
+    test {
+        maxParallelForks = 1
+        minHeapSize '256m'
+        maxHeapSize '2048m'
+        systemProperty 'keystore', projectDir.canonicalPath + "/src/test/resources/stc_keystore.jks"
+        systemProperty 'truststore', projectDir.canonicalPath + "/src/test/resources/stc_truststore.jks"
+    }
+
+    task testJar(type: Jar, dependsOn: testClasses) {
+        baseName = "test-${project.archivesBaseName}"
+        from sourceSets.test.output
+    }
+
+    configurations {
+        tests
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task scaladocJar(type: Jar) {
+        classifier = 'scaladoc'
+        from '../LICENSE'
+        from scaladoc
+    }
+
+    tasks.withType(Tar) {
+        compression Compression.GZIP
+        extension = 'tgz'
+    }
+
+    artifacts {
+        archives javadocJar, scaladocJar, sourcesJar
+    }
+
+    task compile(dependsOn: 'compileScala')
+    javadoc.dependsOn scaladoc
+}
