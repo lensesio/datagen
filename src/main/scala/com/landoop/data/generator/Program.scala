@@ -42,11 +42,11 @@ object Program extends App with StrictLogging {
       |
     """.stripMargin)
 
-  checkAndExit(args.isEmpty, "Missing application configuration file argument.")
-  checkAndExit(args.length < 2, "Missing target topic argument")
+  checkAndExit(args.nonEmpty, "Missing application configuration file argument.")
+  checkAndExit(args.length > 1, "Missing target topic argument")
   val topic = args(1)
 
-  checkAndExit(args.length < 3, "Missing option argument.")
+  checkAndExit(args.length > 2, "Missing option argument.")
   val maybeOption = Try(args(2).toInt).toOption
   checkAndExit(maybeOption.isDefined, s"Invalid option value. Available values are: ${generators.keys.mkString(",")}")
 
@@ -60,12 +60,12 @@ object Program extends App with StrictLogging {
   val config = ConfigFactory.parseFile(new File(args(0)))
   val brokers = config.readString("brokers", null)
 
-  checkAndExit(brokers == null, "Missing 'brokers' configuration entry.")
+  checkAndExit(brokers != null, "Missing 'brokers' configuration entry.")
   val schemaRegistry = config.readString("schema.registry", null)
-  checkAndExit(schemaRegistry == null, "Missing 'schema.registry' configuration entry.")
+  checkAndExit(schemaRegistry != null, "Missing 'schema.registry' configuration entry.")
 
   val formatValue = config.readString("format", null)
-  checkAndExit(formatValue == null, "Missing 'format' configuration entry")
+  checkAndExit(formatValue != null, "Missing 'format' configuration entry")
 
   val format: FormatType = Try {
     FormatType.valueOf(formatValue.trim.toUpperCase())
@@ -85,7 +85,8 @@ object Program extends App with StrictLogging {
 
 
   def checkAndExit(thunk: => Boolean, msg: String): Unit = {
-    if (!thunk) {
+    val value = thunk
+    if (!value) {
       logger.info(msg)
       logger.info("The application will close...")
       logger.info(arguments)
