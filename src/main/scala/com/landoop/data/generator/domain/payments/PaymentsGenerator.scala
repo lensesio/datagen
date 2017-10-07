@@ -36,7 +36,9 @@ object PaymentsGenerator extends Generator with StrictLogging {
         val dt = new DateTime().toDateTime(DateTimeZone.UTC)
         val date = DateFormatter.print(dt)
 
-        var decimal = BigDecimal(Math.random()).setScale(18, RoundingMode.HALF_UP)
+        val left = 10 + Random.nextInt(5000)
+        val right = Random.nextInt(100)
+        var decimal = BigDecimal(s"$left.$right").setScale(18, RoundingMode.HALF_UP)
         val payment = Payment(s"txn${System.currentTimeMillis()}", date, decimal, cc.currency, cc.number, MerchantIds(Random.nextInt(MerchantIds.size)))
         val record = new ProducerRecord[Any, Any](topic, cc.number, rf.to(payment))
         producer.send(record)
