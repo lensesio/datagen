@@ -26,7 +26,6 @@ object PaymentsGenerator extends Generator with StrictLogging {
     implicit val sp = ScaleAndPrecision(18, 38)
     val rf = RecordFormat[Payment]
 
-
     logger.info(s"Publishing payments data to '$topic'")
     try {
       while (true) {
@@ -41,7 +40,7 @@ object PaymentsGenerator extends Generator with StrictLogging {
         val payment = Payment(s"txn${System.currentTimeMillis()}", date, decimal, cc.currency, cc.number, MerchantIds(Random.nextInt(MerchantIds.size)))
         val record = new ProducerRecord[Any, Any](topic, cc.number, rf.to(payment))
         producer.send(record)
-        Thread.sleep(Random.nextInt(100))
+        Thread.sleep(50 + Random.nextInt(101))
       }
     }
     catch {
@@ -66,7 +65,7 @@ object PaymentsGenerator extends Generator with StrictLogging {
         val payment = Payment(s"txn${System.currentTimeMillis()}", date, BigDecimal(Math.random()), cc.currency, cc.number, MerchantIds(Random.nextInt(MerchantIds.size)))
         val record = new ProducerRecord[Any, Any](topic, cc.number, JacksonJson.toJson(payment))
         producer.send(record)
-        Thread.sleep(Random.nextInt(100))
+        Thread.sleep(50 + Random.nextInt(101))
       }
     }
     catch {

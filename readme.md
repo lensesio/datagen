@@ -30,3 +30,14 @@ Available options:
  - 2 -  payments data
 
 
+
+Config
+------
+This is the format of the configuration file the generator expects:
+```json
+brokers=""
+schema.registry=""
+format="avro"
+```
+
+`format` - can be avro or json.
