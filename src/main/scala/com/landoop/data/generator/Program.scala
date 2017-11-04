@@ -15,7 +15,7 @@ object Program extends App with StrictLogging {
   private val arguments =
     """
       |Data Generator Arguments
-      |$configurationFile  $topic $option
+      |$configurationFile  $topic $option [$pauseBetweenRecords]
       |
       |Available options:
       | 1 -  credit card data
@@ -53,6 +53,13 @@ object Program extends App with StrictLogging {
   val maybeGenerator = generators.get(maybeOption.get)
   checkAndExit(maybeGenerator.isDefined, s"Invalid option value. Available values are: ${generators.keys.mkString(",")}")
 
+  var pauseBetweenRecords = 100L
+  if (args.length == 4) {
+    val maybePause = Try(args(3).toLong).toOption
+    checkAndExit(maybePause.isDefined, s"Invalid pause value.")
+    checkAndExit(maybePause.get >= 0, s"Invalid pause value.")
+    pauseBetweenRecords = maybePause.get
+  }
   val generator = maybeGenerator.get
 
   val configFile = new File(args(0))
@@ -76,7 +83,7 @@ object Program extends App with StrictLogging {
     case Success(f) => f
   }
 
-  implicit val generatorConfig = DataGeneratorConfig(brokers, schemaRegistry)
+  implicit val generatorConfig = DataGeneratorConfig(brokers, schemaRegistry, pauseBetweenRecords)
 
   format match {
     case FormatType.AVRO => generator.avro(topic)

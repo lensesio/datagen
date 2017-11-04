@@ -55,6 +55,8 @@ allprojects {
     }
 
     dependencies {
+        compile fileTree(dir: 'libs', include: ['*.jar'])
+
         compile "org.scala-lang:scala-library:$scala"
         compile "com.typesafe.scala-logging:scala-logging-slf4j_$scalaMajorVersion:$scalaLoggingVersion"
         compile "org.apache.kafka:kafka-clients:$kafkaVersion"
