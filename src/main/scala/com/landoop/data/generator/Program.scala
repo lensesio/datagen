@@ -5,6 +5,7 @@ import java.io.File
 import com.landoop.data.generator.config.ConfigExtension._
 import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.domain.Generator
+import com.landoop.data.generator.domain.iot.SensorDataGenerator
 import com.landoop.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.slf4j.StrictLogging
@@ -20,11 +21,13 @@ object Program extends App with StrictLogging {
       |Available options:
       | 1 -  credit card data
       | 2 -  payments data
+      | 3 -  sensor data
     """.stripMargin
 
   val generators = Map[Int, Generator](
     1 -> CreditCardGenerator,
-    2 -> PaymentsGenerator
+    2 -> PaymentsGenerator,
+    3 -> SensorDataGenerator
   )
 
   logger.info(
