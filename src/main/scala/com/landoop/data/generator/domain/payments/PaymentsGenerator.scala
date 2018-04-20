@@ -67,7 +67,7 @@ object PaymentsGenerator extends Generator with StrictLogging {
         val payment = Payment(s"txn${System.currentTimeMillis()}", date, BigDecimal(Math.random()), cc.currency, cc.number, MerchantIds(Random.nextInt(MerchantIds.size)))
         val record = new ProducerRecord[Any, Any](topic, cc.number, JacksonJson.toJson(payment))
         producer.send(record)
-        Thread.sleep(50 + Random.nextInt(101))
+        Thread.sleep(config.pauseBetweenRecordsMs)
       }
     }
     catch {

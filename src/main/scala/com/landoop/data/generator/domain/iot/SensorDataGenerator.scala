@@ -36,7 +36,7 @@ object SensorDataGenerator extends Generator with StrictLogging {
           val record = new ProducerRecord(topic, sensorId, rf.to(sensorData))
           producer.send(record)
         }
-        Thread.sleep(500 + Random.nextInt(101))
+        Thread.sleep(config.pauseBetweenRecordsMs)
       }
     }
     catch {
@@ -61,7 +61,7 @@ object SensorDataGenerator extends Generator with StrictLogging {
           val record = new ProducerRecord(topic, sensorId, JacksonJson.toJson(sensorData))
           producer.send(record)
         }
-        Thread.sleep(500 + Random.nextInt(101))
+        Thread.sleep(config.pauseBetweenRecordsMs)
       }
     }
     catch {
