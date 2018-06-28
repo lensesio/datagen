@@ -22,22 +22,11 @@ Options
 ```json
 
 Data Generator Arguments
-$configurationFile  $topic $option
+--data 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+
+--data 5 --topic iot_device_temperature_xml --format XML --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+
+--data 5 --topic iot_device_temperature_json --format JSON --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+
 ```
 
-Available options:
- - 1 -  credit card data
- - 2 -  payments data
-
-
-
-Config
-------
-This is the format of the configuration file the generator expects:
-```json
-brokers=""
-schema.registry=""
-format="avro"
-```
-
-`format` - can be avro or json.

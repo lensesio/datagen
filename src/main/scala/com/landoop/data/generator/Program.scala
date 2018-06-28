@@ -1,33 +1,24 @@
 package com.landoop.data.generator
 
-import java.io.File
+import java.net.URL
 
-import com.landoop.data.generator.config.ConfigExtension._
 import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.domain.Generator
-import com.landoop.data.generator.domain.iot.SensorDataGenerator
+import com.landoop.data.generator.domain.iot.{DeviceTemperatureDataGenerator, SensorDataGenerator}
 import com.landoop.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
-import com.typesafe.config.ConfigFactory
+import com.landoop.data.generator.domain.weather.WeatherDataGenerator
 import com.typesafe.scalalogging.slf4j.StrictLogging
+import scopt.Read
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 object Program extends App with StrictLogging {
-  private val arguments =
-    """
-      |Data Generator Arguments
-      |$configurationFile  $topic $option [$pauseBetweenRecords]
-      |
-      |Available options:
-      | 1 -  credit card data
-      | 2 -  payments data
-      | 3 -  sensor data
-    """.stripMargin
-
   val generators = Map[Int, Generator](
     1 -> CreditCardGenerator,
     2 -> PaymentsGenerator,
-    3 -> SensorDataGenerator
+    3 -> SensorDataGenerator,
+    4 -> WeatherDataGenerator,
+    5 -> DeviceTemperatureDataGenerator
   )
 
   logger.info(
@@ -45,62 +36,68 @@ object Program extends App with StrictLogging {
       |
     """.stripMargin)
 
-  checkAndExit(args.nonEmpty, "Missing application configuration file argument.")
-  checkAndExit(args.length > 1, "Missing target topic argument")
-  val topic = args(1)
+  val parser = new scopt.OptionParser[Arguments]("generator") {
+    head("generator")
 
-  checkAndExit(args.length > 2, "Missing option argument.")
-  val maybeOption = Try(args(2).toInt).toOption
-  checkAndExit(maybeOption.isDefined, s"Invalid option value. Available values are: ${generators.keys.mkString(",")}")
+    opt[String]("topic").required().action { case (b, a) =>
+      a.copy(topic = b)
+    }.validate(f => if (f.trim.isEmpty) Left("Invalid topic") else Right(()))
+      .text("Kafka topic to publish to")
 
-  val maybeGenerator = generators.get(maybeOption.get)
-  checkAndExit(maybeGenerator.isDefined, s"Invalid option value. Available values are: ${generators.keys.mkString(",")}")
+    opt[Int]("partitions").action { case (b, a) =>
+      a.copy(partitions = b)
+    }.text("Topic partitions")
 
-  var pauseBetweenRecords = 100L
-  if (args.length == 4) {
-    val maybePause = Try(args(3).toLong).toOption
-    checkAndExit(maybePause.isDefined, s"Invalid pause value.")
-    checkAndExit(maybePause.get >= 0, s"Invalid pause value.")
-    pauseBetweenRecords = maybePause.get
+    opt[Int]("replication").action { case (b, a) =>
+      a.copy(replication = b)
+    }.text("Topic replication")
+
+    opt[String]("brokers").required().action { case (b, a) =>
+      a.copy(brokers = b)
+    }.validate(f => if (f.trim.isEmpty) Left("Invalid Kafka bootstrap brokers") else Right(()))
+      .text("Kafka bootstrap brokers")
+
+    opt[String]("schema").action { case (v, a) =>
+      a.copy(schemaRegistry = v)
+    }.validate(f => if (f.trim.nonEmpty && Try(new URL(f.trim)).isSuccess) Right(()) else Left("Invalid Schema Registry URL"))
+      .text("Schema Registry URL")
+
+    opt[String]("schema.mode").action { case (v, a) =>
+      val mode = v.trim.toLowerCase()
+      a.copy(defaultSchemaRegistry = mode == "hortonworks" || mode == "hw")
+    }.text("Schema registry mode. Use 'hw/hortonworks' to use the hortonworks serializers")
+
+    implicit val evFormatType: Read[FormatType] = new scopt.Read[FormatType] {
+      override def arity: Int = 1
+
+      override def reads: String => FormatType = a => FormatType.valueOf(a.trim.toUpperCase())
+    }
+    opt[FormatType]("format").required().action { case (v, a) =>
+      a.copy(format = v)
+    }.text("Format type. AVRO/JSON/XML")
+
+    opt[Int]("data").required().action((v, a) => a.copy(dataSet = v))
+      .validate(v => if (v < 0 && v > 5) Left("Invalid data set option. Available options are 1 to 5") else Right(()))
+      .text(
+        """
+          |Data set type.
+          |Available options:
+          | 1 -  credit card data
+          | 2 -  payments data
+          | 3 -  sensor data
+          | 4 -  weather data
+          | 5 -  device temperature""".stripMargin)
   }
-  val generator = maybeGenerator.get
 
-  val configFile = new File(args(0))
-  checkAndExit(configFile.exists(), s"Invalid configuration file. $configFile can not be found")
-  val config = ConfigFactory.parseFile(new File(args(0)))
-  val brokers = config.readString("brokers", null)
+  parser.parse(args, Arguments("", 1, 1, -1, FormatType.JSON, "", "")).foreach { implicit arguments =>
+    implicit val generatorConfig: DataGeneratorConfig = DataGeneratorConfig(arguments.brokers, arguments.schemaRegistry, arguments.produceDelay, arguments.defaultSchemaRegistry)
 
-  checkAndExit(brokers != null, "Missing 'brokers' configuration entry.")
-  val schemaRegistry = config.readString("schema.registry", null)
-  checkAndExit(schemaRegistry != null, "Missing 'schema.registry' configuration entry.")
-
-  val formatValue = config.readString("format", null)
-  checkAndExit(formatValue != null, "Missing 'format' configuration entry")
-
-  val format: FormatType = Try {
-    FormatType.valueOf(formatValue.trim.toUpperCase())
-  } match {
-    case Failure(t) =>
-      logger.info(s"Format '$formatValue' is incorrect. Expecting: Avro,Json. Application will exit...")
-      sys.exit(1000)
-    case Success(f) => f
-  }
-
-  implicit val generatorConfig = DataGeneratorConfig(brokers, schemaRegistry, pauseBetweenRecords)
-
-  format match {
-    case FormatType.AVRO => generator.avro(topic)
-    case FormatType.JSON => generator.json(topic)
-  }
-
-
-  def checkAndExit(thunk: => Boolean, msg: String): Unit = {
-    val value = thunk
-    if (!value) {
-      logger.info(msg)
-      logger.info("The application will close...")
-      logger.info(arguments)
-      sys.exit(1)
+    CreateTopicFn(arguments.topic, arguments.partitions, arguments.replication)
+    val generator = generators(arguments.dataSet)
+    arguments.format match {
+      case FormatType.AVRO => generator.avro(arguments.topic)
+      case FormatType.JSON => generator.json(arguments.topic)
+      case FormatType.XML => generator.xml(arguments.topic)
     }
   }
 
