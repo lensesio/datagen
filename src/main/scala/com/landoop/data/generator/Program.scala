@@ -4,7 +4,7 @@ import java.net.URL
 
 import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.domain.Generator
-import com.landoop.data.generator.domain.iot.{DeviceTemperatureDataGenerator, SensorDataGenerator}
+import com.landoop.data.generator.domain.iot.{DeviceTemperatureArrayDataGenerator, DeviceTemperatureDataGenerator, SensorDataGenerator}
 import com.landoop.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
 import com.landoop.data.generator.domain.weather.WeatherDataGenerator
 import com.typesafe.scalalogging.slf4j.StrictLogging
@@ -18,7 +18,8 @@ object Program extends App with StrictLogging {
     2 -> PaymentsGenerator,
     3 -> SensorDataGenerator,
     4 -> WeatherDataGenerator,
-    5 -> DeviceTemperatureDataGenerator
+    5 -> DeviceTemperatureDataGenerator,
+    6 -> DeviceTemperatureArrayDataGenerator
   )
 
   logger.info(
@@ -86,7 +87,8 @@ object Program extends App with StrictLogging {
           | 2 -  payments data
           | 3 -  sensor data
           | 4 -  weather data
-          | 5 -  device temperature""".stripMargin)
+          | 5 -  device temperature
+          | 6 -  device temperature array""".stripMargin)
   }
 
   parser.parse(args, Arguments("", 1, 1, -1, FormatType.JSON, "", "")).foreach { implicit arguments =>
