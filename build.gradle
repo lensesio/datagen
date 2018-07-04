@@ -4,15 +4,13 @@ buildscript {
         maven {
             url 'https://plugins.gradle.org/m2/'
         }
+
     }
     dependencies {
         classpath 'com.github.maiflai:gradle-scalatest:0.14'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
-        classpath 'net.researchgate:gradle-release:2.3.4'
     }
 }
-
-
 
 
 allprojects {
@@ -28,10 +26,11 @@ allprojects {
     targetCompatibility = 1.8
 
     ext {
-        scalaMajorVersion = '2.11'
-        scala = '2.11.8'
+        scalaMajorVersion = '2.12'
+        scala = '2.12.5'
         scalaCheck = '1.11.1'
-        scalaLoggingVersion = '2.1.2'
+        logbackVersion = "1.2.3"
+        scalaLoggingVersion = "3.7.2"
         mockitoVersion = '2.7.13'
         slf4jVersion = "1.7.7"
         kafkaVersion = '0.11.0.1'
@@ -40,6 +39,7 @@ allprojects {
         kafkaTesting = "0.1"
         jacksonVersion = "2.9.1"
         jodaVersion = "2.9.9"
+        Slf4jVersion = "1.7.25"
     }
 
     repositories {
@@ -47,6 +47,13 @@ allprojects {
         mavenCentral()
         maven { url "http://packages.confluent.io/maven/" }
         maven { url "http://repo.typesafe.com/typesafe/releases/" }
+        maven {
+            url 'https://artifactory.landoop.com/artifactory/libs-release-local'
+            credentials {
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
     }
 
     configurations {
@@ -58,19 +65,23 @@ allprojects {
         compile fileTree(dir: 'libs', include: ['*.jar'])
 
         compile "org.scala-lang:scala-library:$scala"
-        compile "com.typesafe.scala-logging:scala-logging-slf4j_$scalaMajorVersion:$scalaLoggingVersion"
         compile "org.apache.kafka:kafka-clients:$kafkaVersion"
         //compile "org.apache.kafka:kafka_$scalaMajorVersion:$kafkaVersion"
         compile "io.confluent:kafka-avro-serializer:$confluentVersion"
-        compile "com.sksamuel.avro4s:avro4s-core_2.11:$avro4sVersion"
+        compile "com.sksamuel.avro4s:avro4s-core_$scalaMajorVersion:$avro4sVersion"
         provided "joda-time:joda-time:$jodaVersion"
-
+        compile "org.slf4j:slf4j-api:$Slf4jVersion"
+        compile "com.typesafe.scala-logging:scala-logging_$scalaMajorVersion:$scalaLoggingVersion"
+        compile "ch.qos.logback:logback-classic:$logbackVersion"
         compile("com.typesafe:config:1.2.1")
 
         compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
         compile "com.fasterxml.jackson.module:jackson-module-scala_$scalaMajorVersion:$jacksonVersion"
         compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
-        compile "com.github.scopt:scopt_2.11:3.7.0"
+        compile "com.github.scopt:scopt_$scalaMajorVersion:3.7.0"
+        compile "beyondthelines:pbdirect_$scalaMajorVersion:0.1.0"
+        compile "io.protoless:protoless-core_$scalaMajorVersion:0.0.7"
+        compile "io.protoless:protoless-generic_$scalaMajorVersion:0.0.7"
     }
 
 

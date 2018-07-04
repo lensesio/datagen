@@ -8,4 +8,6 @@ trait Generator {
   def json(topic: String)(implicit config: DataGeneratorConfig): Unit
 
   def xml(topic: String)(implicit config: DataGeneratorConfig): Unit
+
+  def protobuf(topic: String)(implicit config: DataGeneratorConfig): Unit
 }

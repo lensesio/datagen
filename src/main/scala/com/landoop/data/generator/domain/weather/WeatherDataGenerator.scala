@@ -1,12 +1,11 @@
 package com.landoop.data.generator.domain.weather
 
 import com.landoop.data.generator.domain.DataGenerator
-import com.typesafe.scalalogging.slf4j.StrictLogging
 import org.joda.time.DateTime
 
 import scala.util.Random
 
-object WeatherDataGenerator extends DataGenerator[Weather] with StrictLogging {
+object WeatherDataGenerator extends DataGenerator[Weather] {
   private val textValues = Vector("Sunny", "Cloudy", "Mostly Cloudy", "Snowing", "Showers", "Heavy Showers")
   private val dayOfWeekMap = Map(1 -> "Monday", 2 -> "Tuesday", 3 -> "Wednesday", 4 -> "Thursday", 5 -> "Friday", 6 -> "Saturday", 7 -> "Sunday")
 

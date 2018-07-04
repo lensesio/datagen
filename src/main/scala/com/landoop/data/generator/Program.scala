@@ -7,7 +7,7 @@ import com.landoop.data.generator.domain.Generator
 import com.landoop.data.generator.domain.iot.{DeviceTemperatureArrayDataGenerator, DeviceTemperatureDataGenerator, SensorDataGenerator}
 import com.landoop.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
 import com.landoop.data.generator.domain.weather.WeatherDataGenerator
-import com.typesafe.scalalogging.slf4j.StrictLogging
+import com.typesafe.scalalogging.StrictLogging
 import scopt.Read
 
 import scala.util.Try
@@ -100,6 +100,7 @@ object Program extends App with StrictLogging {
       case FormatType.AVRO => generator.avro(arguments.topic)
       case FormatType.JSON => generator.json(arguments.topic)
       case FormatType.XML => generator.xml(arguments.topic)
+      case FormatType.PROTO => generator.protobuf(arguments.topic)
     }
   }
 

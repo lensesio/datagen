@@ -25,4 +25,13 @@ object Producers {
     props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.schemaRegistry)
     props
   }
+
+  def getProducerProps[K <: Serializer[_], V <: Serializer[_]](keySer: Class[K], valueSer:Class[V])(implicit config: DataGeneratorConfig): Properties = {
+    val props = new Properties
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySer)
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSer)
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.brokers)
+    props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.schemaRegistry)
+    props
+  }
 }

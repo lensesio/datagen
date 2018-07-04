@@ -4,12 +4,13 @@ import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.json.{JacksonJson, JacksonXml}
 import com.landoop.data.generator.kafka.Producers
 import com.sksamuel.avro4s.RecordFormat
-import com.typesafe.scalalogging.slf4j.StrictLogging
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
+import pbdirect._
 
-abstract class DataGenerator[T](implicit rf: RecordFormat[T]) extends Generator with StrictLogging {
+abstract class DataGenerator[T](implicit rf: RecordFormat[T], pbWriter: PBWriter[T]) extends Generator with StrictLogging {
 
   protected def generate(): Seq[(String, T)]
 
@@ -63,4 +64,29 @@ abstract class DataGenerator[T](implicit rf: RecordFormat[T]) extends Generator 
         logger.error(s"Failed to publish credit card data to '$topic'", t)
     }
   }
+
+  override def protobuf(topic: String)(implicit config: DataGeneratorConfig): Unit = {
+    val props = Producers.getProducerProps(classOf[StringSerializer], classOf[ByteArraySerializer])
+    implicit val producer: KafkaProducer[String, Array[Byte]] = new KafkaProducer[String, Array[Byte]](props)
+
+    logger.info(s"Publishing sensor data to '$topic'")
+    try {
+      generate(topic, config.pauseBetweenRecordsMs) { v =>
+        v.toPB
+      }
+    }
+    catch {
+      case t: Throwable =>
+        logger.error(s"Failed to publish credit card data to '$topic'", t)
+    }
+  }
+}
+
+
+object DataGenerator {
+
+  import cats.syntax.invariant._
+
+  implicit val instantFormat: PBFormat[BigDecimal] =
+    PBFormat[String].imap(BigDecimal(_))(_.toString())
 }
