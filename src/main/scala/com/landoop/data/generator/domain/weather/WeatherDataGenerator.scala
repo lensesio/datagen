@@ -1,5 +1,7 @@
 package com.landoop.data.generator.domain.weather
 
+import java.io.ByteArrayOutputStream
+
 import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.domain.DataGenerator
 import com.landoop.data.generator.kafka.Producers
@@ -37,7 +39,7 @@ object WeatherDataGenerator extends DataGenerator[WeatherS] {
     val now = DateTime.now()
     val forecasts = (1 to 10).map { i =>
       val d = now.plusDays(1)
-       WeatherOuterClass.Forecast.newBuilder()
+      WeatherOuterClass.Forecast.newBuilder()
         .setDate(d.toString())
         .setDay(dayOfWeekMap(d.dayOfWeek().get()))
         .setHigh(Random.nextInt(100))
@@ -47,7 +49,7 @@ object WeatherDataGenerator extends DataGenerator[WeatherS] {
     }.toList
 
 
-    val wind =  WeatherOuterClass.Wind.newBuilder()
+    val wind = WeatherOuterClass.Wind.newBuilder()
       .setChill(Random.nextInt())
       .setDirection(Random.nextInt(360))
       .setSpeed(Random.nextInt(200))
@@ -64,7 +66,7 @@ object WeatherDataGenerator extends DataGenerator[WeatherS] {
       .setWind(wind)
       .setAtmosphere(atmosphere)
 
-    forecasts.zipWithIndex.foreach { case (f, i) => builder.setForecast(i, f) }
+    forecasts.foreach(builder.addForecast)
     builder.build()
   }
 
@@ -76,11 +78,12 @@ object WeatherDataGenerator extends DataGenerator[WeatherS] {
     logger.info(s"Publishing sensor data to '$topic'")
     try {
       val cities = List("London", "New York", "Paris", "Barcelona", "Tokyo", "Athens", "Sibiu")
-      while(true){
+      while (true) {
         cities.map { c => c -> randWeatherJ() }.foreach { case (k, v) =>
-          val bos = new ByteOutputStream()
+          val bos = new ByteArrayOutputStream()
           v.writeTo(bos)
-          val value = bos.getBytes
+          val value = bos.toByteArray
+
           producer.send(new ProducerRecord(topic, k, value))
           bos.close()
         }
