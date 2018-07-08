@@ -33,11 +33,7 @@ object DeviceTemperatureArrayDataGenerator extends Generator with StrictLogging 
   }
 */
 
-
-
   //implicit val wDeviceTemperatureArray = listWriter[DeviceTemperature]
-
-  println("a")
 
   protected def generate(): List[DeviceTemperature] = {
     devices.map { d =>

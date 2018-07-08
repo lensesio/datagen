@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.google.protobuf" version "0.8.6"
+    id "java"
+}
 
 allprojects {
     group = 'com.landoop'
@@ -21,6 +25,8 @@ allprojects {
     apply plugin: 'scala'
     apply plugin: 'application'
     apply plugin: 'distribution'
+
+    apply plugin: 'com.google.protobuf'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -55,6 +61,24 @@ allprojects {
             }
         }
     }
+    protobuf {
+
+        // Configure the protoc executable
+        protoc {
+            // Download from repositories
+            artifact = 'com.google.protobuf:protoc:3.0.0'
+        }
+    }
+
+    sourceSets {
+        main {
+            proto {
+                // In addition to the default 'src/main/proto'
+                srcDir 'proto/'
+            }
+
+        }
+    }
 
     configurations {
         provided
@@ -66,6 +90,7 @@ allprojects {
 
         compile "org.scala-lang:scala-library:$scala"
         compile "org.apache.kafka:kafka-clients:$kafkaVersion"
+        compile 'com.google.protobuf:protobuf-java:3.0.0'
         //compile "org.apache.kafka:kafka_$scalaMajorVersion:$kafkaVersion"
         compile "io.confluent:kafka-avro-serializer:$confluentVersion"
         compile "com.sksamuel.avro4s:avro4s-core_$scalaMajorVersion:$avro4sVersion"
@@ -82,6 +107,7 @@ allprojects {
         compile "beyondthelines:pbdirect_$scalaMajorVersion:0.1.0"
         compile "io.protoless:protoless-core_$scalaMajorVersion:0.0.7"
         compile "io.protoless:protoless-generic_$scalaMajorVersion:0.0.7"
+        //protobuf fileTree("proto/")
     }
 
 
@@ -96,6 +122,7 @@ allprojects {
 
         //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     }
+
 
     distributions {
         main {
