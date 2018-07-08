@@ -2242,7 +2242,7 @@ public final class WeatherOuterClass {
       return WeatherOuterClass.internal_static_Weather_descriptor;
     }
 
-    protected FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return WeatherOuterClass.internal_static_Weather_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
@@ -2494,8 +2494,7 @@ public final class WeatherOuterClass {
     }
 
     @Override
-    protected Builder newBuilderForType(
-        BuilderParent parent) {
+    protected Builder newBuilderForType(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
