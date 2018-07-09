@@ -30,3 +30,15 @@ Options
 
 ```
 
+Available formats: JSON, XML, AVRO, PROTO
+Available --data options:
+
+ 1 -> CreditCardGenerator,
+ 2 -> PaymentsGenerator,
+ 3 -> SensorDataGenerator,
+ 4 -> WeatherDataGenerator,
+ 5 -> DeviceTemperatureDataGenerator,
+ 6 -> DeviceTemperatureArrayDataGenerator
+ 
+ 
+ Note: option 6 with PROTO format does not work!
