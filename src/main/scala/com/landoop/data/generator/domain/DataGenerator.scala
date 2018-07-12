@@ -1,15 +1,19 @@
 package com.landoop.data.generator.domain
 
+import java.nio.ByteBuffer
+
 import com.landoop.data.generator.config.DataGeneratorConfig
 import com.landoop.data.generator.json.{JacksonJson, JacksonXml}
 import com.landoop.data.generator.kafka.Producers
-import com.sksamuel.avro4s.RecordFormat
+import com.sksamuel.avro4s.{RecordFormat, ScaleAndPrecision, ToValue}
 import com.typesafe.scalalogging.StrictLogging
+import org.apache.avro.{Conversions, LogicalTypes}
 import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import pbdirect._
 
+import DataGenerator._
 abstract class DataGenerator[T](implicit rf: RecordFormat[T], pbWriter: PBWriter[T]) extends Generator with StrictLogging {
 
   protected def generate(): Seq[(String, T)]
@@ -89,4 +93,15 @@ object DataGenerator {
 
   implicit val instantFormat: PBFormat[BigDecimal] =
     PBFormat[String].imap(BigDecimal(_))(_.toString())
+
+  implicit def BigDecimalToValue(implicit sp: ScaleAndPrecision = ScaleAndPrecision(18,38)): ToValue[BigDecimal] = {
+    val decimalConversion = new Conversions.DecimalConversion
+    val decimalType = LogicalTypes.decimal(sp.precision, sp.scale)
+    new ToValue[BigDecimal] {
+      override def apply(value: BigDecimal): ByteBuffer = {
+        decimalConversion.toBytes(value.bigDecimal, null, decimalType)
+      }
+    }
+  }
+
 }

@@ -6,8 +6,9 @@ import org.joda.time.{DateTime, DateTimeZone}
 
 import scala.math.BigDecimal.RoundingMode
 import scala.util.Random
-import  DataGenerator.instantFormat
+import DataGenerator._
 object PaymentsGenerator extends DataGenerator[Payment] {
+
   private val MerchantIds = (1 to 100).map(_.toLong).toVector
   private val DateFormatter = ISODateTimeFormat.dateTime()
 
