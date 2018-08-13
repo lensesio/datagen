@@ -99,7 +99,7 @@ allprojects {
         compile "com.typesafe.scala-logging:scala-logging_$scalaMajorVersion:$scalaLoggingVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion"
         compile("com.typesafe:config:1.2.1")
-
+        compile 'com.univocity:univocity-parsers:2.7.5'
         compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
         compile "com.fasterxml.jackson.module:jackson-module-scala_$scalaMajorVersion:$jacksonVersion"
         compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
