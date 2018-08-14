@@ -4,7 +4,10 @@ import com.univocity.parsers.csv.{CsvParser, CsvParserSettings}
 
 import scala.collection.JavaConverters._
 
-case class Exchange(name: String, symbol: String)
+case class Exchange(name: String, symbol: String) {
+  require(name != null)
+  require(symbol != null)
+}
 
 object Exchange {
   def forSymbol(symbol: String): Exchange = {
@@ -14,12 +17,17 @@ object Exchange {
       case "P" => "NYSE ARCA"
       case "Z" => "BATS Global Markets (BATS)"
       case "V" => "Investors' Exchange, LLC (IEXG)"
+      case _ => "Nasdaq"
     }
     Exchange(name, symbol)
   }
 }
 
-case class Stock(symbol: String, name: String, etf: Boolean, exchange: Exchange, lotSize: Int)
+case class Stock(symbol: String, name: String, etf: Boolean, exchange: Exchange, lotSize: Int) {
+  require(symbol != null)
+  require(name != null)
+  require(exchange != null)
+}
 
 object Stock {
 
@@ -28,6 +36,7 @@ object Stock {
     val settings: CsvParserSettings = new CsvParserSettings
     settings.getFormat.setLineSeparator("\n")
     settings.getFormat.setDelimiter('|')
+    settings.setHeaderExtractionEnabled(true)
 
     val parser: CsvParser = new CsvParser(settings)
     parser.parseAllRecords(getClass.getResourceAsStream("/otherlisted.txt")).asScala
@@ -35,7 +44,7 @@ object Stock {
         Stock(
           record.getString("NASDAQ Symbol"),
           record.getString("Security Name"),
-          record.getBoolean("ETF"),
+          record.getString("ETF") == "Y",
           Exchange.forSymbol(record.getString("Exchange")),
           record.getInt("Round Lot Size")
         )
