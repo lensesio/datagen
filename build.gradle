@@ -107,6 +107,10 @@ allprojects {
         compile "beyondthelines:pbdirect_$scalaMajorVersion:0.1.0"
         compile "io.protoless:protoless-core_$scalaMajorVersion:0.0.7"
         compile "io.protoless:protoless-generic_$scalaMajorVersion:0.0.7"
+        compile 'org.apache.pulsar:pulsar-common:2.0.1-incubating'
+        compile 'org.apache.pulsar:pulsar-client:2.0.1-incubating'
+        compile "com.sksamuel.pulsar4s:pulsar4s-core_$scalaMajorVersion:2.0.0"
+        compile "com.sksamuel.pulsar4s:pulsar4s-circe_$scalaMajorVersion:2.0.0"
         //protobuf fileTree("proto/")
     }
 

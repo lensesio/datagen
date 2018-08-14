@@ -23,7 +23,7 @@ case class Stock(symbol: String, name: String, etf: Boolean, exchange: Exchange,
 
 object Stock {
 
-  def load: Seq[Stock] = {
+  lazy val stocks: Array[Stock] = {
 
     val settings: CsvParserSettings = new CsvParserSettings
     settings.getFormat.setLineSeparator("\n")
@@ -40,7 +40,7 @@ object Stock {
           record.getInt("Round Lot Size")
         )
       }
-  }
+  }.toArray
 }
 
-case class Tick(symbol: String, name: String, category: String, big: Double, ask: Double, etf: Boolean, lotSize: Int, exchange: Exchange)
+case class Tick(symbol: String, name: String, category: String, bid: Double, ask: Double, etf: Boolean, lotSize: Int, exchange: Exchange)
