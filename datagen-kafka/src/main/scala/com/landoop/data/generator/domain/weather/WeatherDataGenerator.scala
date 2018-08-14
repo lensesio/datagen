@@ -13,6 +13,7 @@ import org.joda.time.DateTime
 import scala.util.Random
 
 object WeatherDataGenerator extends DataGenerator[WeatherS] {
+
   private val textValues = Vector("Sunny", "Cloudy", "Mostly Cloudy", "Snowing", "Showers", "Heavy Showers")
   private val dayOfWeekMap = Map(1 -> "Monday", 2 -> "Tuesday", 3 -> "Wednesday", 4 -> "Thursday", 5 -> "Friday", 6 -> "Saturday", 7 -> "Sunday")
 

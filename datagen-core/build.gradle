@@ -1,0 +1,3 @@
+dependencies {
+    compile 'com.univocity:univocity-parsers:2.7.5'
+}

@@ -1,6 +1,5 @@
 package com.landoop.data.generator
 
-import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
 import org.apache.kafka.clients.CommonClientConfigs
