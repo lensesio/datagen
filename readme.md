@@ -22,11 +22,11 @@ Options
 -------
 ```json
 
---data 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+--data 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://broker --schema http://machine:18081
 
---data 5 --topic iot_device_temperature_xml --format XML --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+--data 5 --topic iot_device_temperature_xml --format XML --brokers PLAINTEXT://brokers  --schema http://machine:18081
 
---data 5 --topic iot_device_temperature_json --format JSON --brokers PLAINTEXT://cloudera01.landoop.com:19092,PLAINTEXT://cloudera02.landoop.com:19092 --schema http://cloudera02.landoop.com:18081
+--data 5 --topic iot_device_temperature_json --format JSON --brokers PLAINTEXT://broker --schema http://machine:18081
 
 ```
 
@@ -41,4 +41,3 @@ Available --data options:
  6 -> DeviceTemperatureArrayDataGenerator
  
  
- Note: option 6 with PROTO format does not work!
