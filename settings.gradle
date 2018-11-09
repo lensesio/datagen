@@ -1,3 +1,4 @@
 include 'datagen-core',
         'datagen-kafka',
-        'datagen-pulsar'
+        'datagen-pulsar',
+        'datagen-elastic'

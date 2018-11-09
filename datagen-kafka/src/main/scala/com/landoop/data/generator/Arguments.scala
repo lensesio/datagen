@@ -8,4 +8,4 @@ case class Arguments(topic: String,
                      brokers: String,
                      schemaRegistry: String,
                      defaultSchemaRegistry: Boolean = true,
-                     produceDelay: Long = 100L)
+                     produceDelay: Long = 1)
