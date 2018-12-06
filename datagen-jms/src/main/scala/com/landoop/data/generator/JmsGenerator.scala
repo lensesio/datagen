@@ -49,7 +49,7 @@ object JmsGenerator extends App with StrictLogging {
 
     val producer = sess.createProducer(queue)
 
-    for (_ <- 1 to 10000) {
+    for (k <- 1 to 1000) {
       val tick = StockGenerator.generateTick
       val json =
         s"""{"category" -> "${tick.category}",
@@ -63,6 +63,8 @@ object JmsGenerator extends App with StrictLogging {
         """.stripMargin
       val msg = sess.createTextMessage(json)
       producer.send(msg)
+      if (k % 25 == 0)
+        println(s"Completed $k messsages")
     }
 
     producer.close()
