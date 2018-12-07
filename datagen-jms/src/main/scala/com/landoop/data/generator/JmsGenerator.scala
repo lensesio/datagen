@@ -55,7 +55,7 @@ object JmsGenerator extends App with StrictLogging {
         s"""{"category" : "${tick.category}",
            |"etc" : ${tick.etf},
            |"symbol" : "${tick.symbol}",
-           |"name" : "${tick.name}",
+           |"company" : "${tick.name}",
            |"bid" : ${tick.bid},
            |"ask" : ${tick.ask},
            |"lotsize" : ${tick.lotSize}
