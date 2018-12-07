@@ -52,12 +52,12 @@ object JmsGenerator extends App with StrictLogging {
     for (k <- 1 to 1000) {
       val tick = StockGenerator.generateTick
       val json =
-        s"""{"category" -> "${tick.category}",
-           |"etc" -> ${tick.etf},
-           |"symbol" -> "${tick.symbol}",
-           |"name" -> "${tick.name}",
-           |"bid" -> ${tick.bid},
-           |"ask" -> ${tick.ask},
+        s"""{"category" : "${tick.category}",
+           |"etc" : ${tick.etf},
+           |"symbol" : "${tick.symbol}",
+           |"name" : "${tick.name}",
+           |"bid" : ${tick.bid},
+           |"ask" : ${tick.ask},
            |"lotsize" : ${tick.lotSize}
            |}
         """.stripMargin
