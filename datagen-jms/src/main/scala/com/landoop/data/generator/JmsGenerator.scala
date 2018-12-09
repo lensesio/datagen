@@ -54,7 +54,7 @@ object JmsGenerator extends App with StrictLogging {
 
     val producer = sess.createProducer(queue)
 
-    for (k <- 1 to 1000) {
+    for (k <- 1 to config.count) {
       val tick = StockGenerator.generateTick
       val json =
         s"""{"category": "${tick.category}",
