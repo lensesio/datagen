@@ -8,7 +8,7 @@ import scopt.OptionParser
 
 object JmsGenerator extends App with StrictLogging {
 
-  case class JmsConfig(url: String, queueName: String)
+  case class JmsConfig(url: String, queueName: String, count: Int)
 
   logger.info(
     """
@@ -37,9 +37,14 @@ object JmsGenerator extends App with StrictLogging {
       a.copy(queueName = queue)
     }.validate(f => if (f.trim.isEmpty) Left("Invalid queue") else Right(()))
       .text("queue")
+
+    opt[Int]("count").optional().action { case (count, a) =>
+      a.copy(count = count)
+    }.validate(f => Right(f))
+      .text("count")
   }
 
-  parser.parse(args, JmsConfig("", "")).foreach { config =>
+  parser.parse(args, JmsConfig("", "", 1000)).foreach { config =>
 
     val factory = new ActiveMQConnectionFactory(config.url)
     val conn = factory.createConnection()
@@ -52,18 +57,18 @@ object JmsGenerator extends App with StrictLogging {
     for (k <- 1 to 1000) {
       val tick = StockGenerator.generateTick
       val json =
-        s"""{"category" : "${tick.category}",
-           |"etc" : ${tick.etf},
-           |"symbol" : "${tick.symbol}",
-           |"company" : "${tick.name}",
-           |"bid" : ${tick.bid},
-           |"ask" : ${tick.ask},
-           |"lotsize" : ${tick.lotSize}
+        s"""{"category": "${tick.category}",
+           |"etc": ${tick.etf},
+           |"symbol": "${tick.symbol}",
+           |"company": "${tick.name}",
+           |"bid": ${tick.bid},
+           |"ask": ${tick.ask},
+           |"lotsize": ${tick.lotSize}
            |}
         """.stripMargin
       val msg = sess.createTextMessage(json)
       producer.send(msg)
-      if (k % 25 == 0)
+      if (k % 1000 == 0)
         println(s"Completed $k messsages")
     }
 
