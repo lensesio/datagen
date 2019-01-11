@@ -42,7 +42,7 @@ object JdbcGenerator extends App with StrictLogging {
   parser.parse(args, JdbcConfig("", 1000)).foreach { config =>
 
     val conn = DriverManager.getConnection(config.url)
-    conn.createStatement().execute("create table if not exists stockticks (category varchar(10), etf bool, symbol varchar(8), name varchar(255), bid double, ask double, lotsize smallint)")
+    conn.createStatement().execute("CREATE TABLE IF NOT EXISTS stockticks (category varchar(10), etf bool, symbol varchar(8), name varchar(255), bid double, ask double, lotsize smallint)")
 
     val stmt = conn.prepareStatement("INSERT INTO stockticks (category, etf, symbol, name, bid, ask, lotsize) VALUES (?,?,?,?,?,?,?)")
     for (k <- 1 to config.count) {
