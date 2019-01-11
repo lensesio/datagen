@@ -60,7 +60,7 @@ object JmsGenerator extends App with StrictLogging {
         s"""{"category": "${tick.category}",
            |"etc": ${tick.etf},
            |"symbol": "${tick.symbol}",
-           |"company": "${tick.name}",
+           |"name": "${tick.name}",
            |"bid": ${tick.bid},
            |"ask": ${tick.ask},
            |"lotsize": ${tick.lotSize}
