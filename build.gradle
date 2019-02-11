@@ -1,7 +1,7 @@
 buildscript {
     ext {
         scalaMajorVersion = '2.12'
-        scala = '2.12.5'
+        scala = '2.12.8'
         scalaCheck = '1.11.1'
         logbackVersion = "1.2.3"
         scalaLoggingVersion = "3.7.2"

@@ -3,7 +3,7 @@ package com.landoop.data.generator
 import java.net.URL
 
 import com.landoop.data.generator.config.DataGeneratorConfig
-import com.landoop.data.generator.domain.Generator
+import com.landoop.data.generator.domain.{Generator, SubscriptionGenerator}
 import com.landoop.data.generator.domain.iot.{DeviceTemperatureArrayDataGenerator, DeviceTemperatureDataGenerator, SensorDataGenerator}
 import com.landoop.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
 import com.landoop.data.generator.domain.weather.WeatherDataGenerator
@@ -19,7 +19,8 @@ object Program extends App with StrictLogging {
     3 -> SensorDataGenerator,
     4 -> WeatherDataGenerator,
     5 -> DeviceTemperatureDataGenerator,
-    6 -> DeviceTemperatureArrayDataGenerator
+    6 -> DeviceTemperatureArrayDataGenerator,
+    7 -> SubscriptionGenerator
   )
 
   logger.info(

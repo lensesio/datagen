@@ -30,6 +30,8 @@ dependencies {
 
 repositories {
     maven { url "http://packages.confluent.io/maven/" }
+    maven { url "https://dl.bintray.com/beyondthelines/maven/" }
+    maven { url "https://dl.bintray.com/julien-lafont/maven/" }
 }
 
 sourceSets {
