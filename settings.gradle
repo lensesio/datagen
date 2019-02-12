@@ -2,5 +2,6 @@ include 'datagen-core',
         'datagen-kafka',
         'datagen-pulsar',
         'datagen-elastic',
+        'datagen-redis',
         'datagen-jdbc',
         'datagen-jms'
