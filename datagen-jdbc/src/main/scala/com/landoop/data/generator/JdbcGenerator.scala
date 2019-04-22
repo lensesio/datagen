@@ -1,9 +1,9 @@
-package com.landoop.data.generator
+package io.lenses.data.generator
 
 import java.sql.DriverManager
 
-import com.landoop.data.generator.stocks.StockGenerator
 import com.typesafe.scalalogging.StrictLogging
+import io.lenses.data.generator.stocks.StockGenerator
 import scopt.OptionParser
 
 object JdbcGenerator extends App with StrictLogging {

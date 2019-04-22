@@ -1,6 +1,6 @@
-package com.landoop.data.generator
+package io.lenses.data.generator
 
-import com.landoop.data.generator.stocks.StockGenerator
+import io.lenses.data.generator.stocks.StockGenerator
 import com.typesafe.scalalogging.StrictLogging
 import javax.jms.Session
 import org.apache.activemq.ActiveMQConnectionFactory

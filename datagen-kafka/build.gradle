@@ -2,10 +2,10 @@ buildscript {
     ext {
         scalaMajorVersion = '2.12'
         jacksonVersion = '2.9.6'
-        kafkaVersion = '0.11.0.1'
-        kafkaTesting = "0.1"
-        avro4sVersion = "1.8.0"
+        kafkaVersion = '2.2.0'
+        avro4sVersion = "2.0.4"
         confluentVersion = "3.3.0"
+        sqlLiteVersion = "3.27.2.1"
     }
 }
 
@@ -26,6 +26,9 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "com.fasterxml.jackson.module:jackson-module-scala_$scalaMajorVersion:$jacksonVersion"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
+
+    compile "org.xerial:sqlite-jdbc:$sqlLiteVersion"
+
 }
 
 repositories {

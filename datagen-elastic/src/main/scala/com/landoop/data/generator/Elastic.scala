@@ -1,8 +1,10 @@
-package com.landoop.data.generator
+package io.lenses.data.generator
 
-import com.landoop.data.generator.stocks.StockGenerator
-import com.sksamuel.elastic4s.http.{ElasticClient, ElasticNodeEndpoint, ElasticProperties}
+import com.sksamuel.elastic4s.http.ElasticClient
+import com.sksamuel.elastic4s.http.ElasticNodeEndpoint
+import com.sksamuel.elastic4s.http.ElasticProperties
 import com.typesafe.scalalogging.StrictLogging
+import io.lenses.data.generator.stocks.StockGenerator
 import scopt.OptionParser
 
 object Elastic extends App with StrictLogging {
