@@ -9,9 +9,7 @@ import io.lenses.data.generator.json.JacksonXml
 import io.lenses.data.generator.kafka.Producers
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.apache.kafka.common.serialization.IntegerSerializer
-import pbdirect._
 
 object TripsGenerator extends Generator with StrictLogging {
 
@@ -24,6 +22,9 @@ object TripsGenerator extends Generator with StrictLogging {
     try {
       Trip.fromDb().foreach { trip =>
         val record = new ProducerRecord[Any, Any](topic, trip.id, rf.to(trip))
+        record.headers()
+          .add("Lenses", "2.3.0".getBytes())
+          .add("User", "Lenses-Training".getBytes())
         producer.send(record)
       }
       producer.close()
@@ -44,6 +45,9 @@ object TripsGenerator extends Generator with StrictLogging {
     try {
       Trip.fromDb().foreach { trip =>
         val record = new ProducerRecord[Any, Any](topic, trip.id, JacksonJson.toJson(trip))
+        record.headers()
+          .add("Lenses", "2.3.0".getBytes())
+          .add("User", "Lenses-Training".getBytes())
         producer.send(record)
       }
       producer.close()
