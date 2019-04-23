@@ -66,9 +66,9 @@ object DeviceTemperatureArrayDataGenerator extends Generator with StrictLogging 
     val rf = RecordFormat[DeviceTemperature]
     try
       generate(topic, config.pauseBetweenRecordsMs) { devices: List[DeviceTemperature] =>
-        new GenericData.Array[Record](
+        new GenericData.Array[GenericContainer](
           schema,
-          devices.map(rf.to).map(_.asInstanceOf[Record]).asJava
+          devices.map(rf.to).map(_.asInstanceOf[GenericContainer]).asJava
         ).asInstanceOf[GenericContainer]
       }
 
