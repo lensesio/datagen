@@ -23,6 +23,8 @@ dependencies {
     compile 'com.google.protobuf:protobuf-java:3.0.0'
     compile "com.sksamuel.avro4s:avro4s-core_$scalaMajorVersion:$avro4sVersion"
 
+    compile "io.kotlintest:kotlintest-datagen:0.10.0"
+
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "com.fasterxml.jackson.module:jackson-module-scala_$scalaMajorVersion:$jacksonVersion"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"

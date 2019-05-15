@@ -1,0 +1,14 @@
+buildscript {
+    ext.RxHiveVersion = "0.20.164-SNAPSHOT"
+}
+
+repositories {
+    maven {
+        url "http://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+dependencies {
+    compile project(":datagen-core")
+    compile "com.sksamuel.rxhive:rxhive-core:$RxHiveVersion"
+}
