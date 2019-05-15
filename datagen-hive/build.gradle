@@ -1,5 +1,5 @@
 buildscript {
-    ext.RxHiveVersion = "0.20.164-SNAPSHOT"
+    ext.RxHiveVersion = "0.20.166-SNAPSHOT"
 }
 
 repositories {

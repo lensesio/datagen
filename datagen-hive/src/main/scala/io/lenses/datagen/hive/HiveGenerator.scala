@@ -1,12 +1,12 @@
 package io.lenses.datagen.hive
 
-import com.landoop.data.generator.stocks.StockGenerator
 import com.sksamuel.rxhive.evolution.NoopSchemaEvolver
 import com.sksamuel.rxhive.formats.ParquetFormat
 import com.sksamuel.rxhive.partitioners.DynamicPartitioner
 import com.sksamuel.rxhive.resolver.LenientStructResolver
-import com.sksamuel.rxhive.{CreateTableConfig, DatabaseName, Float64Type, HiveWriter, Int32Type, RxHiveFileNamer, StagingFileManager, StringType, Struct, StructField, StructType, TableName, WriteMode}
+import com.sksamuel.rxhive.{CreateTableConfig, DatabaseName, Float64Type, HiveUtils, HiveWriter, Int32Type, PartitionKey, PartitionPlan, RxHiveFileNamer, StagingFileManager, StringType, Struct, StructField, StructType, TableName, WriteMode}
 import com.typesafe.scalalogging.StrictLogging
+import io.lenses.data.generator.stocks.StockGenerator
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.hive.conf.HiveConf
@@ -15,7 +15,7 @@ import scopt.OptionParser
 
 object HiveGenerator extends App with StrictLogging {
 
-  case class HiveDataGenConfig(table: String, database: String, metastoreUris: String, defaultFS: String, count: Int)
+  case class HiveDataGenConfig(table: String, database: String, metastoreUris: String, defaultFS: String, count: Int, partitions: List[String])
 
   logger.info(
     """
@@ -54,9 +54,13 @@ object HiveGenerator extends App with StrictLogging {
     opt[String]("table").optional().action { case (table, a) =>
       a.copy(table = table)
     }
+
+    opt[String]("partitions").optional().action { case (partitions, a) =>
+      a.copy(partitions = partitions.split(',').map(_.trim).toList)
+    }
   }
 
-  parser.parse(args, HiveDataGenConfig("", "", "", "", 1000)).foreach { config =>
+  parser.parse(args, HiveDataGenConfig("", "", "", "", 1000, Nil)).foreach { config =>
     require(config.defaultFS.nonEmpty)
     require(config.metastoreUris.nonEmpty)
     require(config.table.nonEmpty)
@@ -84,7 +88,12 @@ object HiveGenerator extends App with StrictLogging {
       new StructField("lot-size", Int32Type.INSTANCE)
     )
 
-    val createConfig = new CreateTableConfig(schema, null, TableType.MANAGED_TABLE, ParquetFormat.INSTANCE, null)
+    new HiveUtils(client, fs).dropTable(new DatabaseName(config.database), new TableName(config.table), true)
+
+    import scala.collection.JavaConverters._
+    val plan = if (config.partitions.isEmpty) null else new PartitionPlan(config.partitions.map(new PartitionKey(_)).asJava)
+
+    val createConfig = new CreateTableConfig(schema, plan, TableType.MANAGED_TABLE, ParquetFormat.INSTANCE, null)
     val writer = new HiveWriter(new DatabaseName(config.database), new TableName(config.table), WriteMode.Create, DynamicPartitioner.INSTANCE, new StagingFileManager(RxHiveFileNamer.INSTANCE), NoopSchemaEvolver.INSTANCE, LenientStructResolver.INSTANCE, createConfig, client, fs)
 
     for (k <- 1 to config.count) {
