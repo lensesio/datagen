@@ -2,9 +2,9 @@ package com.landoop.data.generator
 
 import java.time.{Instant, ZoneOffset}
 
-import com.landoop.data.generator.config.DataGeneratorConfig
-import com.landoop.data.generator.kafka.Producers
 import io.kotlintest.datagen.AirportProducer
+import io.lenses.data.generator.config.DataGeneratorConfig
+import io.lenses.data.generator.kafka.Producers
 import org.apache.avro.{LogicalTypes, SchemaBuilder}
 import org.apache.avro.generic.GenericData
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
