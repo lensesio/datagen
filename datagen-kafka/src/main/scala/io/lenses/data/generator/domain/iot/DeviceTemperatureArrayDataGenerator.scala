@@ -1,5 +1,6 @@
 package io.lenses.data.generator.domain.iot
 
+import com.sksamuel.avro4s.AvroSchema
 import com.sksamuel.avro4s.RecordFormat
 import com.sksamuel.avro4s.SchemaFor
 import com.typesafe.scalalogging.StrictLogging
@@ -61,8 +62,8 @@ object DeviceTemperatureArrayDataGenerator extends Generator with StrictLogging 
     implicit val producer: KafkaProducer[String, GenericContainer] = new KafkaProducer[String, GenericContainer](props)
 
     logger.info(s"Publishing sensor data to '$topic'")
-    val deviceSchema = SchemaFor[DeviceTemperature]
-    val schema = SchemaBuilder.array().items(deviceSchema.schema)
+    val deviceSchema = AvroSchema[DeviceTemperature]
+    val schema = SchemaBuilder.array().items(deviceSchema)
     val rf = RecordFormat[DeviceTemperature]
     try
       generate(topic, config.pauseBetweenRecordsMs) { devices: List[DeviceTemperature] =>

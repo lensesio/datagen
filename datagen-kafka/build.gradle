@@ -3,7 +3,7 @@ buildscript {
         scalaMajorVersion = '2.12'
         jacksonVersion = '2.9.6'
         kafkaVersion = '2.2.0'
-        avro4sVersion = "2.0.4"
+        avro4sVersion = "3.0.6"
         confluentVersion = "3.3.0"
         sqlLiteVersion = "3.27.2.1"
     }

@@ -25,7 +25,7 @@ abstract class DataGenerator[T](implicit rf: RecordFormat[T], pbWriter: PBWriter
     Iterator.continually(generate()).flatten.foreach { case (k, v) =>
       val record = new ProducerRecord(topic, k, thunk(v))
       producer.send(record)
-      Thread.sleep(delay)
+      //Thread.sleep(delay)
     }
   }
 

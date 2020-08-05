@@ -14,10 +14,13 @@ object SensorDataGenerator extends DataGenerator[SensorData] {
   override protected def generate(): Seq[(String, SensorData)] = {
     sensorIds.map { sensorId =>
       val prev = dataMap(sensorId)
-      sensorId -> SensorData(sensorId,
+      sensorId -> SensorData(
+        sensorId,
         prev.temperature + Random.nextDouble() * 2 + Random.nextInt(2),
-        prev.humidity + Random.nextDouble() * 2 * (if (Random.nextInt(2) % 2 == 0) -1 else 1),
-        System.currentTimeMillis())
+        prev.humidity + Random
+          .nextDouble() * 2 * (if (Random.nextInt(2) % 2 == 0) -1 else 1),
+        System.currentTimeMillis()
+      )
     }
 
   }
