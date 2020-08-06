@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option java_package = "io.lenses.data.generator.domain.weather";
+
 message Wind {
     int32 chill = 1;
     int32 direction = 2;

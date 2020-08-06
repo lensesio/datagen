@@ -2,5 +2,6 @@
 .metals
 .idea
 .gradle
+target/
 *.iml
 out

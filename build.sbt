@@ -24,7 +24,7 @@ lazy val root = (project in file("."))
       `jackson-module-scala`,
       `jackson-dataformat-xml`,
       `sqlite-jdbc`,
-      `protobuf-java`,
+      // `protobuf-java`,
       `pbdirect`,
       `kotlintest-datagen`
     ),
@@ -35,5 +35,6 @@ lazy val root = (project in file("."))
     ),
     mainClass in (Compile, run) := Some("io.lenses.data.generator.Program")
   )
+  .enablePlugins(ProtobufPlugin)
 
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.
