@@ -10,7 +10,6 @@ lazy val root = (project in file("."))
     name := "datagen",
     libraryDependencies ++= Seq(
       `scalatest` % Test,
-      `scopt`,
       Dependencies.`config`,
       `joda-time`,
       `slf4j-api`,
@@ -24,9 +23,10 @@ lazy val root = (project in file("."))
       `jackson-module-scala`,
       `jackson-dataformat-xml`,
       `sqlite-jdbc`,
-      // `protobuf-java`,
       `pbdirect`,
-      `kotlintest-datagen`
+      `kotlintest-datagen`,
+      `case-app`,
+      `enumeratum`
     ),
     resolvers ++= Seq(
       "Confluent" at "https://packages.confluent.io/maven/",

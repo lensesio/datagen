@@ -16,6 +16,8 @@ object V {
   val pbdirect = "0.2.1"
   val protobuf = "3.0.0"
   val kotlintestDatagen = "0.10.0"
+  val enumeratum = "1.6.0"
+  val caseApp = "2.0.3"
 }
 
 object Dependencies {
@@ -47,4 +49,9 @@ object Dependencies {
   lazy val `sqlite-jdbc` = "org.xerial" % "sqlite-jdbc" % V.sqlite
   lazy val `kotlintest-datagen` =
     "io.kotlintest" % "kotlintest-datagen" % V.kotlintestDatagen
+
+  lazy val enumeratum = "com.beachape" %% "enumeratum" % V.enumeratum
+
+  lazy val `case-app` =
+    "com.github.alexarchambault" %% "case-app" % V.caseApp
 }
