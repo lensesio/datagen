@@ -17,11 +17,21 @@ import io.lenses.data.generator.domain.iot.DeviceTemperatureDataGenerator
 import io.lenses.data.generator.domain.payments.CreditCardGenerator
 import io.lenses.data.generator.domain.recursive.CustomerGenerator
 import io.lenses.data.generator.cli._
-
 import scala.util.Try
 import caseapp._
+import io.lenses.data.generator.schema.Schema
+import io.lenses.data.generator.schema.Record
+import io.lenses.data.generator.http.LensesClient
+import org.http4s.Uri
+import org.http4s.client.blaze.BlazeClientBuilder
+import cats.effect.IO
+import cats.effect.ContextShift
+import cats.instances.stream._
+import cats.syntax.traverse._
+import org.apache.avro.io.EncoderFactory
+import io.lenses.data.generator.schema.AvroConverter
 
-object Program extends caseapp.CaseApp[Arguments] with StrictLogging {
+object Program extends caseapp.CommandApp[Command] with StrictLogging {
   lazy val generators = Map[Int, Generator](
     1 -> CreditCardGenerator,
     2 -> PaymentsGenerator,
@@ -36,41 +46,69 @@ object Program extends caseapp.CaseApp[Arguments] with StrictLogging {
     11 -> OrdersGenerator
   )
 
-  def run(arguments: Arguments, otherArgs: RemainingArgs) = {
-    logger.info(
-      """
-      |
-      |  _
-      | | |    ___ _ __  ___  ___  ___
-      | | |   / _ \ '_ \/ __|/ _ \/ __|
-      | | |__|  __/ | | \__ \  __/\__ \
-      | |_____\___|_|_|_|___/\___||___/                         _
-      | |  _ \  __ _| |_ __ _   / ___| ___ _ __   ___ _ __ __ _| |_ ___  _ __
-      | | | | |/ _` | __/ _` | | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \| '__|
-      | | |_| | (_| | || (_| | | |_| |  __/ | | |  __/ | | (_| | || (_) | |
-      | |____/ \__,_|\__\__,_|  \____|\___|_| |_|\___|_|  \__,_|\__\___/|_|
-      |
-    """.stripMargin
-    )
+  def run(command: Command, otherArgs: RemainingArgs) =
+    command match {
+      case NewGen(numDatasets) =>
+        import org.scalacheck.Gen
+        import io.lenses.data.generator.schema.Gens
 
-    implicit val generatorConfig: DataGeneratorConfig = DataGeneratorConfig(
-      arguments.brokers,
-      arguments.schema,
-      arguments.produceDelay,
-      arguments.schemaMode
-    )
+        val ec = scala.concurrent.ExecutionContext.global
+        implicit val cs: ContextShift[IO] = IO.contextShift(ec)
 
-    CreateTopicFn(
-      arguments
-    )
+        BlazeClientBuilder[IO](ec).resource
+          .use { httpClient =>
+            val client = LensesClient(
+              Uri.unsafeFromString("http://localhost:24015"),
+              httpClient
+            )
 
-    val generator = generators(arguments.dataSet)
-    arguments.format match {
-      case FormatType.AVRO  => generator.avro(arguments.topic)
-      case FormatType.JSON  => generator.json(arguments.topic)
-      case FormatType.XML   => generator.xml(arguments.topic)
-      case FormatType.PROTO => generator.protobuf(arguments.topic)
+            client.login("admin", "admin").flatMap { implicit auth =>
+              Gen.infiniteStream(Gens.namedSchema).sample match {
+                case None =>
+                  IO.raiseError(
+                    new IllegalStateException("Cannot generate data")
+                  )
+                case Some(schemas) =>
+                  schemas.take(numDatasets).traverse {
+                    case (schemaName, schema) =>
+                      client.createTopic(schemaName) *> client.setTopicMetadata(
+                        schemaName,
+                        AvroConverter(schema, Some(schemaName))
+                      )
+                  }
+              }
+            }
+          }
+          .unsafeRunSync()
+
+        def printFields(schema: Schema) = {
+          println("====================")
+          schema match {
+            case Record(fields, _) =>
+              fields.foreach(field => println(field.name))
+            case _ => println("not a record ...")
+          }
+        }
+
+      case oldGen: OldGen =>
+        implicit val generatorConfig: DataGeneratorConfig = DataGeneratorConfig(
+          oldGen.brokers,
+          oldGen.schema,
+          oldGen.produceDelay,
+          oldGen.schemaMode
+        )
+
+        CreateTopicFn(
+          oldGen
+        )
+
+        val generator = generators(oldGen.dataSet)
+        oldGen.format match {
+          case FormatType.AVRO  => generator.avro(oldGen.topic)
+          case FormatType.JSON  => generator.json(oldGen.topic)
+          case FormatType.XML   => generator.xml(oldGen.topic)
+          case FormatType.PROTO => generator.protobuf(oldGen.topic)
+        }
     }
-  }
 
 }

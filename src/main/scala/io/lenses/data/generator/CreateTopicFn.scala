@@ -6,9 +6,10 @@ import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
 
 import scala.util.Try
+import io.lenses.data.generator.cli.OldGen
 
 object CreateTopicFn {
-  def apply(arguments: Arguments): Try[Unit] = {
+  def apply(arguments: OldGen): Try[Unit] = {
     Try {
       createAdminClient(arguments.brokers)
     }.map { implicit adminClient =>

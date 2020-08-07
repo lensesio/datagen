@@ -8,6 +8,8 @@ ThisBuild / organizationName := "datagen"
 lazy val root = (project in file("."))
   .settings(
     name := "datagen",
+    scalacOptions ++= Seq(
+    ),
     libraryDependencies ++= Seq(
       `scalatest` % Test,
       Dependencies.`config`,
@@ -26,7 +28,12 @@ lazy val root = (project in file("."))
       `pbdirect`,
       `kotlintest-datagen`,
       `case-app`,
-      `enumeratum`
+      `scalacheck`,
+      `enumeratum`,
+      `http4s-blaze-client`,
+      `http4s-circe`,
+      `http4s-dsl`,
+      `circe-generic`
     ),
     resolvers ++= Seq(
       "Confluent" at "https://packages.confluent.io/maven/",

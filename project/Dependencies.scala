@@ -18,6 +18,9 @@ object V {
   val kotlintestDatagen = "0.10.0"
   val enumeratum = "1.6.0"
   val caseApp = "2.0.3"
+  val http4s = "0.21.5"
+  val circe = "0.13.0"
+  val scalacheck = "1.14.1"
 }
 
 object Dependencies {
@@ -34,10 +37,6 @@ object Dependencies {
   lazy val `kafka-avro-serializer` =
     "io.confluent" % "kafka-avro-serializer" % V.confluent
   lazy val `pbdirect` = "beyondthelines" %% "pbdirect" % V.pbdirect
-//    lazy val `` = "io.protoless:protoless-core_$scalaMajorVersion:0.0.7"
-//    lazy val `` = "io.protoless:protoless-generic_$scalaMajorVersion:0.0.7"
-  lazy val `protobuf-java` =
-    "com.google.protobuf" % "protobuf-java" % V.protobuf
   lazy val `avro4s-core` = "com.sksamuel.avro4s" %% "avro4s-core" % V.avro4s
 
   lazy val `jackson-databind` =
@@ -54,4 +53,14 @@ object Dependencies {
 
   lazy val `case-app` =
     "com.github.alexarchambault" %% "case-app" % V.caseApp
+
+  lazy val `scalacheck` =
+    "org.scalacheck" %% "scalacheck" % V.scalacheck
+
+  lazy val `http4s-blaze-client` =
+    "org.http4s" %% "http4s-blaze-client" % V.http4s
+  lazy val `http4s-circe` = "org.http4s" %% "http4s-circe" % V.http4s
+  lazy val `http4s-dsl` = "org.http4s" %% "http4s-dsl" % V.http4s
+  lazy val `circe-generic` = "io.circe" %% "circe-generic" % V.circe
+
 }
