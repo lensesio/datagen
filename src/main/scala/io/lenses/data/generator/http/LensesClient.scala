@@ -11,11 +11,15 @@ import org.http4s.Headers
 import org.http4s.Header
 import org.apache.avro
 import org.apache.avro.Schema
+import io.lenses.data.generator.cli.LensesCreds
 
 object LensesClient {
   final case class AuthToken(value: String) extends AnyVal
 
-  def apply(baseUrl: Uri, client: Client[IO]): LensesClient =
+  def apply(
+      baseUrl: Uri,
+      client: Client[IO]
+  ): LensesClient =
     new LensesClient {
 
       override def setTopicMetadata(topicName: String, schema: Schema)(implicit

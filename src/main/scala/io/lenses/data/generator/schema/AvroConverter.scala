@@ -19,7 +19,8 @@ object AvroConverter {
         fields
           .foldLeft(SchemaBuilder.record(name).fields()) {
             case (b, field) =>
-              val valueSchema0 = AvroConverter(field.value, None)
+              val valueSchema0 =
+                AvroConverter(field.value, Some(s"${name}_${field.name}"))
 
               val valueSchema =
                 if (field.isNullable)

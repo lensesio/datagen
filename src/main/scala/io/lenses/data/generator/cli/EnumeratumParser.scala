@@ -10,13 +10,14 @@ trait EnumeratumParser {
   implicit def parseEnum[A <: EnumEntry](implicit
       enum: Enum[A]
   ): ArgParser[A] = {
-    SimpleArgParser.from[A]("A <: enumEntry") { name =>
+    val values = enum.values.mkString(", ")
+    SimpleArgParser.from[A](values) { name =>
       enum
         .withNameEither(name)
         .leftMap[Error](err =>
           Error.MalformedValue(
             err.notFoundName,
-            s"Acceptable values are: ${err.enumValues.mkString(", ")}"
+            s"Acceptable values are: $values"
           )
         )
     }

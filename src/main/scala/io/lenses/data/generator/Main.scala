@@ -30,8 +30,10 @@ import cats.instances.stream._
 import cats.syntax.traverse._
 import org.apache.avro.io.EncoderFactory
 import io.lenses.data.generator.schema.AvroConverter
+import io.lenses.data.generator.schema.DatasetCreator
+import org.http4s.client.middleware.Logger
 
-object Program extends caseapp.CommandApp[Command] with StrictLogging {
+object Main extends caseapp.CommandApp[Command] with StrictLogging {
   lazy val generators = Map[Int, Generator](
     1 -> CreditCardGenerator,
     2 -> PaymentsGenerator,
@@ -48,49 +50,60 @@ object Program extends caseapp.CommandApp[Command] with StrictLogging {
 
   def run(command: Command, otherArgs: RemainingArgs) =
     command match {
-      case NewGen(numDatasets) =>
+      case GenSchemas(
+            numKafkaDatasets,
+            numElasticDatasets,
+            lensesBaseUrl,
+            lensesCreds,
+            elasticsearchBaseUrl
+          ) =>
         import org.scalacheck.Gen
         import io.lenses.data.generator.schema.Gens
 
         val ec = scala.concurrent.ExecutionContext.global
         implicit val cs: ContextShift[IO] = IO.contextShift(ec)
+        val config =
+          schema.Gens.Config(recordsOnly = true, maxDepth = 3)
 
         BlazeClientBuilder[IO](ec).resource
-          .use { httpClient =>
+          .use { httpClient0 =>
+            val httpClient = Logger(true, true)(httpClient0)
+
             val client = LensesClient(
-              Uri.unsafeFromString("http://localhost:24015"),
+              lensesBaseUrl,
               httpClient
             )
 
-            client.login("admin", "admin").flatMap { implicit auth =>
-              Gen.infiniteStream(Gens.namedSchema).sample match {
-                case None =>
-                  IO.raiseError(
-                    new IllegalStateException("Cannot generate data")
-                  )
-                case Some(schemas) =>
-                  schemas.take(numDatasets).traverse {
-                    case (schemaName, schema) =>
-                      client.createTopic(schemaName) *> client.setTopicMetadata(
-                        schemaName,
-                        AvroConverter(schema, Some(schemaName))
-                      )
+            fs2
+              .Stream(
+                Gens
+                  .namedSchemas(numKafkaDatasets, config)
+                  .parEvalMap(3) {
+                    case (datasetName, schema) =>
+                      DatasetCreator
+                        .Kafka(client, lensesCreds)
+                        .create(datasetName, schema)(ec, cs)
+                  },
+                Gens
+                  .namedSchemas(numElasticDatasets, config)
+                  .parEvalMap(3) {
+                    case (datasetName, schema) =>
+                      DatasetCreator
+                        .Elasticsearch(
+                          httpClient,
+                          elasticsearchBaseUrl
+                        )
+                        .create(datasetName, schema)(ec, cs)
                   }
-              }
-            }
+              )
+              .parJoinUnbounded
+              .compile
+              .drain
+
           }
           .unsafeRunSync()
 
-        def printFields(schema: Schema) = {
-          println("====================")
-          schema match {
-            case Record(fields, _) =>
-              fields.foreach(field => println(field.name))
-            case _ => println("not a record ...")
-          }
-        }
-
-      case oldGen: OldGen =>
+      case oldGen: GenRecords =>
         implicit val generatorConfig: DataGeneratorConfig = DataGeneratorConfig(
           oldGen.brokers,
           oldGen.schema,

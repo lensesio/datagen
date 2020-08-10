@@ -21,6 +21,7 @@ object V {
   val http4s = "0.21.5"
   val circe = "0.13.0"
   val scalacheck = "1.14.1"
+  val fs2 = "2.4.0"
 }
 
 object Dependencies {
@@ -62,5 +63,7 @@ object Dependencies {
   lazy val `http4s-circe` = "org.http4s" %% "http4s-circe" % V.http4s
   lazy val `http4s-dsl` = "org.http4s" %% "http4s-dsl" % V.http4s
   lazy val `circe-generic` = "io.circe" %% "circe-generic" % V.circe
+
+  lazy val `fs2-core` = "co.fs2" %% "fs2-core" % V.fs2
 
 }

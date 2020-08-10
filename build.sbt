@@ -29,18 +29,19 @@ lazy val root = (project in file("."))
       `kotlintest-datagen`,
       `case-app`,
       `scalacheck`,
+      `circe-generic`,
       `enumeratum`,
       `http4s-blaze-client`,
       `http4s-circe`,
       `http4s-dsl`,
-      `circe-generic`
+      `fs2-core`
     ),
     resolvers ++= Seq(
       "Confluent" at "https://packages.confluent.io/maven/",
       "Repo2" at "https://dl.bintray.com/beyondthelines/maven/",
       "Repo3" at "https://dl.bintray.com/julien-lafont/maven/"
     ),
-    mainClass in (Compile, run) := Some("io.lenses.data.generator.Program")
+    mainClass in (Compile, run) := Some("io.lenses.data.generator.Main")
   )
   .enablePlugins(ProtobufPlugin)
 
