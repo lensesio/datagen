@@ -36,6 +36,11 @@ import doobie.util.transactor.Transactor
 import cats.effect.Blocker
 
 object Main extends caseapp.CommandApp[Command] with StrictLogging {
+
+  override val appName = "Lenses Datagen"
+  override val appVersion = "0.1.0"
+  override val progName = "datagen"
+
   lazy val generators = Map[Int, Generator](
     1 -> CreditCardGenerator,
     2 -> PaymentsGenerator,
