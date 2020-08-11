@@ -16,7 +16,6 @@ lazy val root = (project in file("."))
       `joda-time`,
       `slf4j-api`,
       `scala-logging`,
-      `logback`,
       `univocity-parsers`,
       `kafka-client`,
       `kafka-avro-serializer`,
@@ -34,15 +33,20 @@ lazy val root = (project in file("."))
       `http4s-blaze-client`,
       `http4s-circe`,
       `http4s-dsl`,
-      `fs2-core`
+      `fs2-core`,
+      `doobie-core`,
+      `doobie-postgres`
     ),
     resolvers ++= Seq(
       "Confluent" at "https://packages.confluent.io/maven/",
       "Repo2" at "https://dl.bintray.com/beyondthelines/maven/",
       "Repo3" at "https://dl.bintray.com/julien-lafont/maven/"
     ),
-    mainClass in (Compile, run) := Some("io.lenses.data.generator.Main")
+    mainClass in (Compile, run) := Some("io.lenses.data.generator.Main"),
+    mainClass in assembly := Some("io.lenses.data.generator.Main"),
+    assemblyJarName in assembly := "datagen-x.jar",
+    test in assembly := {}
   )
   .enablePlugins(ProtobufPlugin)
 
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.
+Global / onChangedBuildSource := ReloadOnSourceChanges

@@ -22,6 +22,7 @@ object V {
   val circe = "0.13.0"
   val scalacheck = "1.14.1"
   val fs2 = "2.4.0"
+  val doobie = "0.9.0"
 }
 
 object Dependencies {
@@ -65,5 +66,7 @@ object Dependencies {
   lazy val `circe-generic` = "io.circe" %% "circe-generic" % V.circe
 
   lazy val `fs2-core` = "co.fs2" %% "fs2-core" % V.fs2
+  lazy val `doobie-core` = "org.tpolecat" %% "doobie-core" % V.doobie
+  lazy val `doobie-postgres` = "org.tpolecat" %% "doobie-postgres" % V.doobie
 
 }

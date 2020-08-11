@@ -26,12 +26,14 @@ import org.http4s.Uri
 import org.http4s.client.blaze.BlazeClientBuilder
 import cats.effect.IO
 import cats.effect.ContextShift
-import cats.instances.stream._
-import cats.syntax.traverse._
+import cats.implicits._
 import org.apache.avro.io.EncoderFactory
 import io.lenses.data.generator.schema.AvroConverter
 import io.lenses.data.generator.schema.DatasetCreator
 import org.http4s.client.middleware.Logger
+import io.lenses.data.generator.schema.pg.PostgresConfig
+import doobie.util.transactor.Transactor
+import cats.effect.Blocker
 
 object Main extends caseapp.CommandApp[Command] with StrictLogging {
   lazy val generators = Map[Int, Generator](
@@ -53,9 +55,13 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
       case GenSchemas(
             numKafkaDatasets,
             numElasticDatasets,
+            numPostgresDatasets,
             lensesBaseUrl,
             lensesCreds,
-            elasticsearchBaseUrl
+            elasticsearchBaseUrl,
+            postgresSchema,
+            postgresDatabase,
+            postgresCreds
           ) =>
         import org.scalacheck.Gen
         import io.lenses.data.generator.schema.Gens
@@ -65,23 +71,48 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
         val config =
           schema.Gens.Config(recordsOnly = true, maxDepth = 3)
 
+        val maybeTransactor = postgresDatabase.map { db =>
+          Transactor.fromDriverManager[IO](
+            "org.postgresql.Driver", // driver classname
+            s"jdbc:postgresql:$db", // connect URL (driver-specific)
+            postgresCreds.user,
+            postgresCreds.password,
+            Blocker.liftExecutionContext(ec)
+          )
+        }
+
         BlazeClientBuilder[IO](ec).resource
           .use { httpClient0 =>
             val httpClient = Logger(true, true)(httpClient0)
-
-            val client = LensesClient(
+            val lensesClient = LensesClient(
               lensesBaseUrl,
               httpClient
             )
 
             fs2
               .Stream(
+                maybeTransactor.fold(fs2.Stream.eval(IO.unit)) { xa =>
+                  Gens
+                    .namedSchemas(numPostgresDatasets, config)
+                    .evalMap {
+                      case (datasetName, schema) =>
+                        DatasetCreator
+                          .Postgres(
+                            xa,
+                            PostgresConfig(
+                              Some("baz"),
+                              addPrimaryKey = true
+                            )
+                          )
+                          .create(datasetName, schema)(ec, cs)
+                    }
+                },
                 Gens
                   .namedSchemas(numKafkaDatasets, config)
                   .parEvalMap(3) {
                     case (datasetName, schema) =>
                       DatasetCreator
-                        .Kafka(client, lensesCreds)
+                        .Kafka(lensesClient, lensesCreds)
                         .create(datasetName, schema)(ec, cs)
                   },
                 Gens

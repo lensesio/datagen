@@ -11,7 +11,7 @@ import org.http4s.Headers
 import org.http4s.Header
 import org.apache.avro
 import org.apache.avro.Schema
-import io.lenses.data.generator.cli.LensesCreds
+import io.lenses.data.generator.cli.Creds
 
 object LensesClient {
   final case class AuthToken(value: String) extends AnyVal

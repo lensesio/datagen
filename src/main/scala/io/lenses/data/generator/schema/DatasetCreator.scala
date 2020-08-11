@@ -12,7 +12,11 @@ import org.http4s.Method
 import org.http4s.circe._
 import io.circe.Json
 import org.http4s.Status
-import io.lenses.data.generator.cli.LensesCreds
+import io.lenses.data.generator.cli.Creds
+import doobie.util.transactor.Transactor
+import io.lenses.data.generator.schema.pg.PostgresConfig
+import io.lenses.data.generator.schema.converters.PostgresConverter
+import cats.implicits._
 
 trait DatasetCreator {
   def create(name: String, schema: Schema)(implicit
@@ -24,7 +28,7 @@ trait DatasetCreator {
 object DatasetCreator {
   def Kafka(
       lensesClient: LensesClient,
-      lensesCreds: LensesCreds
+      lensesCreds: Creds
   ): DatasetCreator =
     new DatasetCreator {
       override def create(schemaName: String, schema: Schema)(implicit
@@ -70,6 +74,30 @@ object DatasetCreator {
         }
       }
 
+    }
+
+  def Postgres(tx: Transactor[IO], config: PostgresConfig): DatasetCreator =
+    new DatasetCreator {
+      import doobie._
+      import doobie.implicits._
+
+      override def create(name: String, schema: Schema)(implicit
+          ec: ExecutionContext,
+          cs: ContextShift[IO]
+      ): IO[Unit] = {
+        implicit val logHandler = LogHandler.jdkLogHandler
+        val converter = new PostgresConverter(config)
+        val dll = converter(schema, Some(name))
+
+        val createPgSchema =
+          config.containingSchema.fold(0.pure[ConnectionIO])(schema =>
+            Update0.apply(s"CREATE SCHEMA IF NOT EXISTS $schema ", None).run
+          )
+
+        val createTable = converter(schema, Some(name)).asDLL.update.run
+
+        (createPgSchema *> createTable).transact(tx).void
+      }
     }
 
 }
