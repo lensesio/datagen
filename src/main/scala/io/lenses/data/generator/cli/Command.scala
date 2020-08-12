@@ -36,7 +36,9 @@ final case class GenSchemas(
     @HelpMessage("Lenses user credentials (defaults to admin:admin)")
     lensesCreds: Creds = Creds("admin", "admin"),
     @HelpMessage("Elasticsearch base URL (defaults to http://localhost:9200)")
-    elasticsearchBaseurl: Uri = Uri.unsafeFromString("http://localhost:9200"),
+    elasticBaseurl: Uri = Uri.unsafeFromString("http://localhost:9200"),
+    @HelpMessage("Elasticsearch creds (defaults to None)")
+    elasticCreds: Option[Creds] = None,
     @HelpMessage("Create Postgres tables within a schema (defaults to none)")
     postgresSchema: Option[String] = None,
     @HelpMessage(
@@ -44,7 +46,7 @@ final case class GenSchemas(
     )
     postgresDatabase: Option[String] = None,
     @HelpMessage("Postgres credentials (defaults to 'postgres:'')")
-    postgresUserPassword: Creds = Creds("postgres", "")
+    postgresCreds: Creds = Creds("postgres", "")
 ) extends Command
 
 final case class GenRecords(

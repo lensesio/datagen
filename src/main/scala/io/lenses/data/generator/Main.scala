@@ -64,6 +64,7 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
             lensesBaseUrl,
             lensesCreds,
             elasticsearchBaseUrl,
+            maybeElasticCreds,
             postgresSchema,
             postgresDatabase,
             postgresCreds
@@ -127,7 +128,8 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
                       DatasetCreator
                         .Elasticsearch(
                           httpClient,
-                          elasticsearchBaseUrl
+                          elasticsearchBaseUrl,
+                          maybeElasticCreds
                         )
                         .create(datasetName, schema)(ec, cs)
                   }

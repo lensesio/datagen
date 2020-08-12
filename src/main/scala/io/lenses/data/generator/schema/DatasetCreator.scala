@@ -9,6 +9,9 @@ import cats.effect.ContextShift
 import org.http4s.client.Client
 import org.http4s.Request
 import org.http4s.Method
+import org.http4s.BasicCredentials
+import org.http4s.headers.{Authorization, `Content-Type`}
+import org.http4s.MediaType.application
 import org.http4s.circe._
 import io.circe.Json
 import org.http4s.Status
@@ -17,6 +20,10 @@ import doobie.util.transactor.Transactor
 import io.lenses.data.generator.schema.pg.PostgresConfig
 import io.lenses.data.generator.schema.converters.PostgresConverter
 import cats.implicits._
+import org.http4s.Headers
+import org.http4s.Credentials
+import org.http4s.BasicCredentials
+import org.http4s.MediaType
 
 trait DatasetCreator {
   def create(name: String, schema: Schema)(implicit
@@ -46,8 +53,11 @@ object DatasetCreator {
       }
     }
 
-  //TODO: add creds
-  def Elasticsearch(httpClient: Client[IO], baseUrl: Uri): DatasetCreator =
+  def Elasticsearch(
+      httpClient: Client[IO],
+      baseUrl: Uri,
+      creds: Option[Creds]
+  ): DatasetCreator =
     new DatasetCreator {
 
       override def create(name: String, schema: Schema)(implicit
@@ -59,7 +69,13 @@ object DatasetCreator {
           Request[IO](method = Method.PUT, uri = baseUrl / name.toLowerCase())
             .withEntity(body)
 
-        httpClient.run(request).use {
+        val authedRequest = creds.fold(request) { creds =>
+          request.putHeaders(
+            Authorization(BasicCredentials(creds.user, creds.password))
+          )
+        }
+
+        httpClient.run(authedRequest).use {
           case Status.Successful(r) => IO.unit
           case resp =>
             resp

@@ -1,0 +1,38 @@
+#name: Publish
+#on:
+#  push:
+#jobs:
+#  Publish:
+#    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || startsWith(github.ref,'refs/heads/release/')
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 10
+#    env:
+#      artifactory_user: ${{ secrets.artifactory_user }}
+#      artifactory_password: ${{ secrets.artifactory_password }}
+#      github_run_id: ${{ github.run_id }}
+#    steps:
+#      - uses: actions/checkout@v1
+#      - uses: olafurpg/setup-scala@v7
+#        with:
+#          java-version: adopt@1.8
+#      - name: Cache Coursier / SBT
+#        uses: actions/cache@v2
+#        with:
+#          path: |
+#            ~/.cache/coursier
+#            ~/.sbt
+#          key: sbt-coursier-cache-${{ hashFiles('**/build.sbt') }}-${{ hashFiles('project/*.scala') }}
+#      - name: Sbt publish
+#        run: "sbt -v -trace 0 publish"
+#      - name: Sbt read version
+#        id: sbt_version
+#        run: echo "##[set-output name=version;]$(sbt --error 'print lenses-core/version')"
+#      - name: Artefacts for this build have been published with version `${{ steps.sbt_version.outputs.version }}`.
+#        run: true
+      # - name: Add version comment
+      #  uses: peter-evans/create-or-update-comment@v1
+      #  with:
+      #    issue-number: ${{ github.event.number }}
+      #    edit-mode: replace
+      #    body: |
+      #      Artefacts for this build have been [published](https://lenses.jfrog.io/lenses/libs-release-local/io/lenses/lenses-core/${{ steps.sbt_version.outputs.version }}) with version: `${{ steps.sbt_version.outputs.version }}`.
