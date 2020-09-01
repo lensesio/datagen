@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_package = "io.lenses.data.generator.domain.weather";
+
+message Wind {
+    int32 chill = 1;
+    int32 direction = 2;
+    int32 speed = 3;
+};
+
+message Atmosphere {
+    int32 humidity = 1;
+    double pressure = 2;
+    int32 rising = 3;
+    double visibility = 4;
+};
+
+message Forecast {
+    string date = 1;
+    string day = 2;
+    int32 high = 3;
+    int32 low = 4;
+    string text = 5;
+}
+
+message Weather {
+    Wind wind = 1;
+    Atmosphere atmosphere = 2;
+    repeated Forecast forecast = 3;
+};

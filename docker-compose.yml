@@ -1,0 +1,66 @@
+version: "2"
+
+services:
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+
+  jolokia:
+    image: jolokia/java-jolokia
+    volumes:
+      - /opt/jolokia/
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    ports:
+      - "9200:9200"
+    environment:
+      discovery.type: "single-node"
+      ELASTIC_SECURITY: "true"
+      ELASTIC_PASSWORD: "changeme"
+      xpack.security.enabled: "true"
+
+  # This version of box spins up an Elasticsearch instance.
+  # However, the smoketest requires a more recent one to run (>= 7.x), so we do not use it
+  lenses:
+    image: "lensesio/box:4.0"
+    environment:
+      ADV_HOST: localhost
+      EULA: "${EULA}"
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
+      KAFKA_SUPER_USERS: User:kafka;
+      KAFKA_PRINCIPAL_BUILDER_CLASS: de.thmshmm.kafka.CustomPrincipalBuilder
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      CONNECTORS: "redis"
+      REST_PORT: 0
+      FORWARDLOGS: 0
+      RUNTESTS: 0
+      SAMPLEDATA: 0
+      BROKER_OPTS: "-javaagent:/opt/jolokia/jolokia.jar=port=10089,host=0.0.0.0"
+      ZOOKEEPER_OPTS: "-javaagent:/opt/jolokia/jolokia.jar=port=10088,host=0.0.0.0"
+      SCHEMA_REGISTRY_OPTS: "-javaagent:/opt/jolokia/jolokia.jar=port=10087,host=0.0.0.0"
+      CONNECT_OPTS: "-javaagent:/opt/jolokia/jolokia.jar=port=10086,host=0.0.0.0"
+      SUPERVISORWEB: "1"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    ports:
+      - 9001:9001
+      - 9092:9092
+      - 8081:8081
+      - 8083:8083
+      - 2181:2181
+      - 9581:9581
+      - 9582:9582
+      - 9585:9585
+      - 9584:9584
+      - 3030:3030
+      - 9010:9010
+      - 9395:9395
+      - 9991:9991
+      - 10089:10089
+      - 10088:10088
+      - 10087:10087
+      - 10086:10086
+    volumes_from:
+      - jolokia

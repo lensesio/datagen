@@ -1,5 +1,0 @@
-dependencies {
-    compile project(":datagen-core")
-    compile "com.sksamuel.pulsar4s:pulsar4s-core_$scalaMajorVersion:2.1.0"
-    compile "com.sksamuel.pulsar4s:pulsar4s-circe_$scalaMajorVersion:2.1.0"
-}

@@ -1,8 +1,0 @@
-include 'datagen-core',
-        'datagen-kafka',
-        'datagen-hive',
-        'datagen-pulsar',
-        'datagen-elastic',
-   //     'datagen-redis',
-        'datagen-jdbc',
-        'datagen-jms'

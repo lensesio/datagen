@@ -1,4 +1,0 @@
-dependencies {
-    compile project(":datagen-core")
-    compile 'com.sksamuel.elastic4s:elastic4s-http_2.12:6.4.0'
-}

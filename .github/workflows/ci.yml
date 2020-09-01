@@ -1,0 +1,40 @@
+name: CI
+on:
+  pull_request:
+jobs:
+  Build:
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v1
+      - name: "Docker Compose UP"
+        # Would there be any performance benefits if we were to use Github Service Containers instead of Docker compose?
+        #
+        # https://help.github.com/en/actions/configuring-and-managing-workflows/about-service-containers
+        run: docker-compose --log-level INFO up -d --build
+        env:
+          EULA: ${{ secrets.EULA }}
+      - uses: olafurpg/setup-scala@v7
+        with:
+          java-version: adopt@1.8
+      - name: Cache Coursier / SBT
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/coursier
+            ~/.sbt
+          key: sbt-coursier-cache-${{ hashFiles('**/build.sbt') }}-${{ hashFiles('project/*.scala') }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.11.4"
+      - name: Sbt test
+        run: "sbt -v -trace 0 -Dsbt.color=always -Dsbt.supershell=false test"
+        #env:
+        #  artifactory_user: ${{ secrets.artifactory_user }}
+        #  artifactory_password: ${{ secrets.artifactory_password }}
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"

@@ -1,4 +1,8 @@
+.bloop
+.metals
 .idea
 .gradle
+target/
 *.iml
 out
+.env
