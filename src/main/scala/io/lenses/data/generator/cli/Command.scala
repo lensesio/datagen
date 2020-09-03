@@ -32,7 +32,7 @@ final case class GenSchemas(
     lensesBaseUrl: Uri = Uri.unsafeFromString("http://localhost:24015"),
     @HelpMessage("Lenses user credentials (defaults to admin:admin)")
     lensesCreds: Creds = Creds("admin", "admin"),
-    @HelpMessage("Lenses basic auth creds (needed for running against traefik)")
+    @HelpMessage("Lenses basic auth creds (needed for running against traefik) (defaults to none)")
     lensesBasicAuthCreds: Option[Creds] = None,
     @HelpMessage("Elasticsearch base URL (defaults to http://localhost:9200)")
     elasticBaseUrl: Uri = Uri.unsafeFromString("http://localhost:9200"),
