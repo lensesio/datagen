@@ -31,7 +31,8 @@ class SmokeTest extends AnyFlatSpec with Matchers {
     LensesClient(
       Uri.unsafeFromString(lensesBaseUrl),
       httpClient,
-      lensesCreds
+      lensesCreds,
+      None
     )
 
   val elasticBaseUrl = "http://localhost:9200"
