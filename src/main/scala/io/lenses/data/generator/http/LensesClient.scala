@@ -1,30 +1,33 @@
 package io.lenses.data.generator.http
 
 import cats.effect.IO
-import org.http4s.Uri
-import org.http4s.client.Client
-import org.http4s.Request
-import org.http4s.circe._
-import io.circe.Json
-import org.http4s.Method
-import org.http4s.dsl.io._
-import org.http4s.Headers
-import org.http4s.Header
-import org.apache.avro
-import org.apache.avro.Schema
+import io.circe.{Decoder, Json}
 import io.circe.generic.semiauto.deriveDecoder
 import io.lenses.data.generator.cli.Creds
-import org.http4s.dsl.impl.Auth
-import fs2.concurrent.Topic
-import io.circe.Decoder
+import org.apache.avro
+import org.apache.avro.Schema
+import org.http4s.circe._
+import org.http4s.client.Client
+import org.http4s.headers.Authorization
+import org.http4s._
 
 object LensesClient {
+  implicit class RequestHeaderExtension(request: Request[IO]) {
+    def withLensesAuthHeaders(authToken: Option[AuthToken], basicAuthCreds: Option[Creds]): Request[IO] = {
+      request.withHeaders(Headers(List(
+        authToken.map { case AuthToken(value) => Header("X-Kafka-Lenses-Token", value) },
+        basicAuthCreds.map { case Creds(user, pass) => Authorization(BasicCredentials(user, pass)) }
+      ).flatten))
+    }
+  }
+
   final case class AuthToken(value: String) extends AnyVal
 
   def apply(
       baseUrl: Uri,
       client: Client[IO],
-      creds: Creds
+      creds: Creds,
+      basicAuthCreds: Option[Creds]
   ): LensesClient =
     new LensesClient {
 
@@ -36,9 +39,7 @@ object LensesClient {
             method = Method.POST,
             uri = baseUrl / "api" / "v1" / "metadata" / "topics"
           )
-            .withHeaders(
-              Header("X-Kafka-Lenses-Token", auth.value)
-            )
+            .withLensesAuthHeaders(Some(auth), basicAuthCreds)
             .withEntity(
               Json.obj(
                 "topicName" -> Json.fromString(topicName),
@@ -54,6 +55,7 @@ object LensesClient {
       override def login() = {
         val request =
           Request[IO](method = Method.POST, uri = baseUrl / "api" / "login")
+            .withLensesAuthHeaders(None, basicAuthCreds)
             .withEntity(
               Json.obj(
                 "user" -> Json.fromString(creds.user),
@@ -76,9 +78,7 @@ object LensesClient {
         )
         val request =
           Request[IO](method = Method.POST, uri = baseUrl / "api" / "topics")
-            .withHeaders(
-              Header("X-Kafka-Lenses-Token", auth.value)
-            )
+            .withLensesAuthHeaders(Some(auth), basicAuthCreds)
             .withEntity(entity)
         client.expect[Unit](request)
       }
@@ -99,9 +99,7 @@ object LensesClient {
               )
             )
           )
-            .withHeaders(
-              Header("X-Kafka-Lenses-Token", auth.value)
-            )
+            .withLensesAuthHeaders(Some(auth), basicAuthCreds)
         client.expect[TopicResponse](request).map {
           _.totalTopicCount
         }
@@ -110,7 +108,7 @@ object LensesClient {
     }
 }
 
-import LensesClient.AuthToken
+import io.lenses.data.generator.http.LensesClient.AuthToken
 trait LensesClient {
   def login(): IO[AuthToken]
   def createTopic(topicName: String)(implicit auth: AuthToken): IO[Unit]

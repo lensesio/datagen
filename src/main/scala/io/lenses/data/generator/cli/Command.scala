@@ -1,13 +1,10 @@
 package io.lenses.data.generator.cli
 
 import caseapp._
-import io.lenses.data.generator.FormatType
-import cats.effect.Resource.Par
-import caseapp.core.argparser.SimpleArgParser
-import caseapp.core.argparser.ArgParser
 import caseapp.core.Error
+import caseapp.core.argparser.{ArgParser, SimpleArgParser}
+import io.lenses.data.generator.FormatType
 import org.http4s.Uri
-import cats.data.Op
 
 sealed trait Command
 
@@ -35,6 +32,8 @@ final case class GenSchemas(
     lensesBaseUrl: Uri = Uri.unsafeFromString("http://localhost:24015"),
     @HelpMessage("Lenses user credentials (defaults to admin:admin)")
     lensesCreds: Creds = Creds("admin", "admin"),
+    @HelpMessage("Lenses basic auth creds (needed for running against traefik)")
+    lensesBasicAuthCreds: Option[Creds] = None,
     @HelpMessage("Elasticsearch base URL (defaults to http://localhost:9200)")
     elasticBaseUrl: Uri = Uri.unsafeFromString("http://localhost:9200"),
     @HelpMessage("Elasticsearch creds (defaults to None)")

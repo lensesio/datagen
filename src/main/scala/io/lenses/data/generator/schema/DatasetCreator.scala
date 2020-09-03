@@ -1,29 +1,19 @@
 package io.lenses.data.generator.schema
 
-import cats.effect.IO
-import io.lenses.data.generator.http.LensesClient
-import org.http4s.client.blaze.BlazeClientBuilder
-import org.http4s.Uri
-import scala.concurrent.ExecutionContext
-import cats.effect.ContextShift
-import org.http4s.client.Client
-import org.http4s.Request
-import org.http4s.Method
-import org.http4s.BasicCredentials
-import org.http4s.headers.{Authorization, `Content-Type`}
-import org.http4s.MediaType.application
-import org.http4s.circe._
-import io.circe.Json
-import org.http4s.Status
-import io.lenses.data.generator.cli.Creds
-import doobie.util.transactor.Transactor
-import io.lenses.data.generator.schema.pg.PostgresConfig
-import io.lenses.data.generator.schema.converters.PostgresConverter
+import cats.effect.{ContextShift, IO}
 import cats.implicits._
-import org.http4s.Headers
-import org.http4s.Credentials
-import org.http4s.BasicCredentials
-import org.http4s.MediaType
+import doobie.util.transactor.Transactor
+import io.circe.Json
+import io.lenses.data.generator.cli.Creds
+import io.lenses.data.generator.http.LensesClient
+import io.lenses.data.generator.schema.converters.PostgresConverter
+import io.lenses.data.generator.schema.pg.PostgresConfig
+import org.http4s._
+import org.http4s.circe._
+import org.http4s.client.Client
+import org.http4s.headers.Authorization
+
+import scala.concurrent.ExecutionContext
 
 trait DatasetCreator {
   def create(name: String, schema: Schema)(implicit
@@ -34,8 +24,7 @@ trait DatasetCreator {
 
 object DatasetCreator {
   def Kafka(
-      lensesClient: LensesClient,
-      lensesCreds: Creds
+      lensesClient: LensesClient
   ): DatasetCreator =
     new DatasetCreator {
       override def create(schemaName: String, schema: Schema)(implicit
