@@ -15,9 +15,10 @@ object AvroConverter {
       case (Primitive.Boolean, _) => SchemaBuilder.builder.booleanType()
       case (ArrayOf(schema), _) =>
         SchemaBuilder.array().items(AvroConverter(schema, None))
-      case (Record(fields, _), Some(name)) =>
+      case (Record(fields, description), Some(name)) =>
+        val baseRecord = SchemaBuilder.record(name)
         fields
-          .foldLeft(SchemaBuilder.record(name).fields()) {
+          .foldLeft(description.map(baseRecord.doc).getOrElse(baseRecord).fields()) {
             case (b, field) =>
               val valueSchema0 =
                 AvroConverter(field.value, Some(s"${name}_${field.name}"))
@@ -32,8 +33,8 @@ object AvroConverter {
                 else
                   valueSchema0
 
-              b.name(field.name)
-                .`type`(valueSchema)
+              val named = b.name(field.name)
+              field.description.map(named.doc).getOrElse(named).`type`(valueSchema)
                 .noDefault()
 
           }
