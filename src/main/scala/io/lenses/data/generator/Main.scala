@@ -1,39 +1,23 @@
 package io.lenses.data.generator
 
-import java.net.URL
-
-import com.typesafe.scalalogging.StrictLogging
-import io.lenses.data.generator.config.DataGeneratorConfig
-import io.lenses.data.generator.domain.SubscriptionGenerator
-import io.lenses.data.generator.domain.iot.DeviceTemperatureArrayDataGenerator
-import io.lenses.data.generator.domain.iot.SensorDataGenerator
-import io.lenses.data.generator.domain.payments.PaymentsGenerator
-import io.lenses.data.generator.domain.weather.WeatherDataGenerator
-import io.lenses.data.generator.domain.Generator
-import io.lenses.data.generator.domain.arrayorders.OrdersGenerator
-import io.lenses.data.generator.domain.bikesharing.StationsGenerator
-import io.lenses.data.generator.domain.bikesharing.TripsGenerator
-import io.lenses.data.generator.domain.iot.DeviceTemperatureDataGenerator
-import io.lenses.data.generator.domain.payments.CreditCardGenerator
-import io.lenses.data.generator.domain.recursive.CustomerGenerator
-import io.lenses.data.generator.cli._
-import scala.util.Try
 import caseapp._
-import io.lenses.data.generator.schema.Schema
-import io.lenses.data.generator.schema.Record
-import io.lenses.data.generator.http.LensesClient
-import org.http4s.Uri
-import org.http4s.client.blaze.BlazeClientBuilder
-import cats.effect.IO
-import cats.effect.ContextShift
-import cats.implicits._
-import org.apache.avro.io.EncoderFactory
-import io.lenses.data.generator.schema.AvroConverter
-import io.lenses.data.generator.schema.DatasetCreator
-import org.http4s.client.middleware.Logger
-import io.lenses.data.generator.schema.pg.PostgresConfig
+import cats.effect.{Blocker, ContextShift, IO}
+import com.typesafe.scalalogging.StrictLogging
 import doobie.util.transactor.Transactor
-import cats.effect.Blocker
+import io.lenses.data.generator.cli._
+import io.lenses.data.generator.config.DataGeneratorConfig
+import io.lenses.data.generator.domain.{Generator, SubscriptionGenerator}
+import io.lenses.data.generator.domain.arrayorders.OrdersGenerator
+import io.lenses.data.generator.domain.bikesharing.{StationsGenerator, TripsGenerator}
+import io.lenses.data.generator.domain.iot.{DeviceTemperatureArrayDataGenerator, DeviceTemperatureDataGenerator, SensorDataGenerator}
+import io.lenses.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
+import io.lenses.data.generator.domain.recursive.CustomerGenerator
+import io.lenses.data.generator.domain.weather.WeatherDataGenerator
+import io.lenses.data.generator.http.LensesClient
+import io.lenses.data.generator.schema.DatasetCreator
+import io.lenses.data.generator.schema.pg.PostgresConfig
+import org.http4s.client.blaze.BlazeClientBuilder
+import org.http4s.client.middleware.Logger
 
 object Main extends caseapp.CommandApp[Command] with StrictLogging {
 
@@ -63,13 +47,13 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
             numPostgresDatasets,
             lensesBaseUrl,
             lensesCreds,
+            lensesBasicAuthCreds,
             elasticsearchBaseUrl,
             maybeElasticCreds,
             postgresSchema,
             postgresDatabase,
             postgresCreds
           ) =>
-        import org.scalacheck.Gen
         import io.lenses.data.generator.schema.Gens
 
         val ec = scala.concurrent.ExecutionContext.global
@@ -93,7 +77,8 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
             val lensesClient = LensesClient(
               lensesBaseUrl,
               httpClient,
-              lensesCreds
+              lensesCreds,
+              lensesBasicAuthCreds
             )
 
             fs2
@@ -119,7 +104,7 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
                   .parEvalMap(3) {
                     case (datasetName, schema) =>
                       DatasetCreator
-                        .Kafka(lensesClient, lensesCreds)
+                        .Kafka(lensesClient)
                         .create(datasetName, schema)(ec, cs)
                   },
                 Gens
