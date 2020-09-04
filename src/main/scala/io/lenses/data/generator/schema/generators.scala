@@ -61,8 +61,8 @@ object Gens {
     for {
       tpe <- gen
       isNullable <- nullable
-      documentation <- Gen.listOfN(10, noun).map(_.mkString(" "))
-    } yield Field(name, tpe, isNullable, Some(documentation))
+      documentation <- Gen.option(Gen.listOfN(10, noun).map(_.mkString(" ")))
+    } yield Field(name, tpe, isNullable, documentation)
 
   def record(
       maxFields: Int = 15,
@@ -87,8 +87,8 @@ object Gens {
         Gen.containerOfN[Set, String](numFields, compositeNoun(8, camelCase))
       fieldGens = fieldNames.map(name => field(name, valueGen))
       fields <- Gen.sequence(fieldGens).map(_.asScala.toVector.toList)
-      documentation <- Gen.listOfN(10, noun).map(_.mkString(" "))
-    } yield Record(fields, Some(documentation))
+      documentation <- Gen.option(Gen.listOfN(10, noun).map(_.mkString(" ")))
+    } yield Record(fields, documentation)
   }
 
   def schema(
