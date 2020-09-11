@@ -6,3 +6,6 @@ target/
 *.iml
 out
 .env
+project/metals.sbt
+.vscode/
+project/project/

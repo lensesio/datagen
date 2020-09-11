@@ -18,6 +18,7 @@ import io.lenses.data.generator.schema.DatasetCreator
 import io.lenses.data.generator.schema.pg.PostgresConfig
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.client.middleware.Logger
+import io.lenses.data.generator.domain.extremes.ExtremeCaseGenerator
 
 object Main extends caseapp.CommandApp[Command] with StrictLogging {
 
@@ -36,7 +37,9 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
     8 -> StationsGenerator,
     9 -> TripsGenerator,
     10 -> CustomerGenerator,
-    11 -> OrdersGenerator
+    11 -> OrdersGenerator,
+    13 -> ExtremeCaseGenerator.largeMessageGenerator(10),
+    14 -> ExtremeCaseGenerator.nestedMessageGenerator(10)
   )
 
   def run(command: Command, otherArgs: RemainingArgs) =

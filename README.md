@@ -44,12 +44,19 @@ gen-records --data 5 --topic iot_device_temperature_avro --format AVRO --brokers
 Available formats: JSON, XML, AVRO, PROTO
 Available --data options:
 
- 1 -> CreditCardGenerator,
- 2 -> PaymentsGenerator,
- 3 -> SensorDataGenerator,
- 4 -> WeatherDataGenerator,
- 5 -> DeviceTemperatureDataGenerator,
- 6 -> DeviceTemperatureArrayDataGenerator
+ 1  -> CreditCardGenerator,
+ 2  -> PaymentsGenerator,
+ 3  -> SensorDataGenerator,
+ 4  -> WeatherDataGenerator,
+ 5  -> DeviceTemperatureDataGenerator,
+ 6  -> DeviceTemperatureArrayDataGenerator
+ 7  -> SubscriptionGenerator,
+ 8  -> StationsGenerator,
+ 9  -> TripsGenerator,
+ 10 -> CustomerGenerator,
+ 11 -> OrdersGenerator,
+ 12 -> Big messages generator,
+ 13 -> Nested messages generator
 
 ## Legacy generators
 
