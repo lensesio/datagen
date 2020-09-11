@@ -13,8 +13,8 @@ object ExtremeCaseGenerator {
   import Random._
   implicit val keyStringRand = KeyGenerator[String](Random(randomUUID.toString))
   
-  def largeMessageGenerator(messagesAmount: Int): Generator = {
-    def nextLargeString = String.valueOf(Array.fill(450000)(scala.util.Random.nextPrintableChar()))
+  def sizedMessageGenerator(messageSize: Int, messagesAmount: Int): Generator = {
+    def nextLargeString = String.valueOf(Array.fill(messageSize)(scala.util.Random.nextPrintableChar()))
     implicit val valueStringRand = Random[String](nextLargeString)
 
     val msgs: Stream[SimpleMessage] = Stream.continually(Random[SimpleMessage].next).take(messagesAmount)

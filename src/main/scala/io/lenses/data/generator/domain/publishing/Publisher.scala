@@ -24,7 +24,7 @@ class Publisher[A: ClassTag, K, KS <: Serializer[_], V, VS <: Serializer[_]](
     extends StrictLogging {
 
   def publish(as: Stream[A], topic: String): Unit = {
-    val name = implicitly[ClassTag[A]].runtimeClass.getName()
+    val name = implicitly[ClassTag[A]].runtimeClass.getSimpleName()
     val props = Producers.getProducerProps(keySchema.serClass, valSchema.serClass)
     val producer = new KafkaProducer[K, V](props)
 

@@ -38,11 +38,11 @@ Legacy data generators that will ingest multiple randomly generated records into
 ### Usage
 
 ```bash
-gen-records --data 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://broker --schema http://machine:18081
+gen-records --data-set 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://broker --schema http://machine:18081
 ```
 
 Available formats: JSON, XML, AVRO, PROTO
-Available --data options:
+Available --data-set options:
 
  1  -> CreditCardGenerator,
  2  -> PaymentsGenerator,
@@ -55,8 +55,9 @@ Available --data options:
  9  -> TripsGenerator,
  10 -> CustomerGenerator,
  11 -> OrdersGenerator,
- 12 -> Big messages generator,
- 13 -> Nested messages generator
+ 12 -> Big message (almost 0.5Mb) generator,
+ 13 -> Large message (almost 1Mb) generator,
+ 14 -> Nested message generator
 
 ## Legacy generators
 
