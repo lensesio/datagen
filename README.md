@@ -59,6 +59,8 @@ Available --data-set options:
  13 -> Large message (almost 1Mb) generator,
  14 -> Nested message generator
 
+Generation of nested messages (14) fails for AVRO - avro schema can not be created and pushed to the Schema Registry.
+
 ## Legacy generators
 
 This project initially contained generators for a number of data systems that are not yet supported by Lenses (e.g JMS, Pulsar, Hive). In order to simplify the build, these have been recently removed. However, they can be can be easily accessed through [this commit](https://github.com/lensesio/datagen/commit/3aefd7870a066588a44e7a5e79a734012a2a0e9d) and might be reinstated at a later stage.
