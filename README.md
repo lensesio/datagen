@@ -38,18 +38,28 @@ Legacy data generators that will ingest multiple randomly generated records into
 ### Usage
 
 ```bash
-gen-records --data 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://broker --schema http://machine:18081
+gen-records --data-set 5 --topic iot_device_temperature_avro --format AVRO --brokers PLAINTEXT://broker --schema http://machine:18081
 ```
 
 Available formats: JSON, XML, AVRO, PROTO
-Available --data options:
+Available --data-set options:
 
- 1 -> CreditCardGenerator,
- 2 -> PaymentsGenerator,
- 3 -> SensorDataGenerator,
- 4 -> WeatherDataGenerator,
- 5 -> DeviceTemperatureDataGenerator,
- 6 -> DeviceTemperatureArrayDataGenerator
+ 1  -> CreditCardGenerator,
+ 2  -> PaymentsGenerator,
+ 3  -> SensorDataGenerator,
+ 4  -> WeatherDataGenerator,
+ 5  -> DeviceTemperatureDataGenerator,
+ 6  -> DeviceTemperatureArrayDataGenerator
+ 7  -> SubscriptionGenerator,
+ 8  -> StationsGenerator,
+ 9  -> TripsGenerator,
+ 10 -> CustomerGenerator,
+ 11 -> OrdersGenerator,
+ 12 -> Big message (almost 0.5Mb) generator,
+ 13 -> Large message (almost 1Mb) generator,
+ 14 -> Nested message generator
+
+Generation of nested messages (14) fails for AVRO - avro schema can not be created and pushed to the Schema Registry.
 
 ## Legacy generators
 
