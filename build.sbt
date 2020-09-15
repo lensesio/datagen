@@ -16,6 +16,7 @@ lazy val root = (project in file("."))
       `joda-time`,
       `slf4j-api`,
       `scala-logging`,
+      // `logback`,
       `univocity-parsers`,
       `kafka-client`,
       `kafka-avro-serializer`,

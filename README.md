@@ -2,12 +2,23 @@
 
 A cli tool to generate test data for Lenses and its supported data sources.
 
+## Buildin from source
+
+In order to build Datagen from source you will need to install the Google protobuf compiler. Please ensure the `protoc` executable is in your `PATH`.
+With this installed, you should be able to build a standalone executable Jar by running:
+
+```
+sbt assembly
+```
+
+When the operation completes, the jar will be available under `target/scala-2.13/`.
+
 ## Available generators
 
-The following generators are available:
+The following generators are available as cli subcommands:
 
-- records: given a topic, a dataset and a format, ingest auto-generated records in the topic
-- schemas: generates an arbitrary number of topics and configure them with a randomly generated schema.
+- _records_: given a topic, a dataset and a format, ingest auto-generated records in the topic
+- _schemas_: generates an arbitrary number of topics and configure them with a randomly generated schema.
 
 ## Schema generator
 
@@ -16,24 +27,35 @@ This generator is aimed at testing Lenses Explore screen and its search function
 ### Usage:
 
 ```bash
-Usage: datagen gen-schemas
+java -jar datagen.jar gen-schemas
   --num-kafka-datasets  <int>
         Number of kafka topics to generate
   --num-elastic-datasets  <int>
         Number of Elasticsearch indexes to generate
+  --num-postgres-datasets  <int>
+        Number of Postgres tables to generate
   --lenses-base-url  <URI>
         Lenses base URL (defaults to http://localhost:24015)
   --lenses-creds  <user:password>
         Lenses user credentials (defaults to admin:admin)
-  --elasticsearch-baseurl  <URI>
+  --lenses-basic-auth-creds  <user:password?>
+        Lenses basic auth creds (needed for running against traefik) (defaults to none)
+  --elastic-base-url  <URI>
         Elasticsearch base URL (defaults to http://localhost:9200)
-
+  --elastic-creds  <user:password?>
+        Elasticsearch creds (defaults to None)
+  --postgres-schema  <string?>
+        Create Postgres tables within a schema (defaults to none)
+  --postgres-database  <string?>
+        Postgres database (required to generate postgres tables)
+  --postgres-creds  <user:password>
+        Postgres credentials (defaults to 'postgres:'')
 
 ```
 
 ## Record generator
 
-Legacy data generators that will ingest multiple randomly generated records into the supplied Kafka topics. A set of predefined schemas is supported and can be generated in multiple wire formats.
+Data generators that will ingest multiple records into the supplied Kafka topics. A set of predefined generators and schema is supported and can be generated in multiple wire formats.
 
 ### Usage
 
@@ -44,6 +66,7 @@ gen-records --data-set 5 --topic iot_device_temperature_avro --format AVRO --bro
 Available formats: JSON, XML, AVRO, PROTO
 Available --data-set options:
 
+```
  1  -> CreditCardGenerator,
  2  -> PaymentsGenerator,
  3  -> SensorDataGenerator,
@@ -58,6 +81,7 @@ Available --data-set options:
  12 -> Big message (almost 0.5Mb) generator,
  13 -> Large message (almost 1Mb) generator,
  14 -> Nested message generator
+ ```
 
 Generation of nested messages (14) fails for AVRO - avro schema can not be created and pushed to the Schema Registry.
 

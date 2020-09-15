@@ -8,9 +8,19 @@ import io.lenses.data.generator.cli._
 import io.lenses.data.generator.config.DataGeneratorConfig
 import io.lenses.data.generator.domain.{Generator, SubscriptionGenerator}
 import io.lenses.data.generator.domain.arrayorders.OrdersGenerator
-import io.lenses.data.generator.domain.bikesharing.{StationsGenerator, TripsGenerator}
-import io.lenses.data.generator.domain.iot.{DeviceTemperatureArrayDataGenerator, DeviceTemperatureDataGenerator, SensorDataGenerator}
-import io.lenses.data.generator.domain.payments.{CreditCardGenerator, PaymentsGenerator}
+import io.lenses.data.generator.domain.bikesharing.{
+  StationsGenerator,
+  TripsGenerator
+}
+import io.lenses.data.generator.domain.iot.{
+  DeviceTemperatureArrayDataGenerator,
+  DeviceTemperatureDataGenerator,
+  SensorDataGenerator
+}
+import io.lenses.data.generator.domain.payments.{
+  CreditCardGenerator,
+  PaymentsGenerator
+}
 import io.lenses.data.generator.domain.recursive.CustomerGenerator
 import io.lenses.data.generator.domain.weather.WeatherDataGenerator
 import io.lenses.data.generator.http.LensesClient
@@ -38,8 +48,10 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
     9 -> TripsGenerator,
     10 -> CustomerGenerator,
     11 -> OrdersGenerator,
-    12 -> ExtremeCaseGenerator.sizedMessageGenerator(messageSize = 470000, messagesAmount = 20),
-    13 -> ExtremeCaseGenerator.sizedMessageGenerator(messageSize = 970000, messagesAmount = 20),
+    12 -> ExtremeCaseGenerator
+      .sizedMessageGenerator(messageSize = 470000, messagesAmount = 20),
+    13 -> ExtremeCaseGenerator
+      .sizedMessageGenerator(messageSize = 970000, messagesAmount = 20),
     14 -> ExtremeCaseGenerator.nestedMessageGenerator(messagesAmount = 20)
   )
 
@@ -141,7 +153,7 @@ object Main extends caseapp.CommandApp[Command] with StrictLogging {
 
         CreateTopicFn(
           oldGen
-        )
+        ).get
 
         val generator = generators(oldGen.dataSet)
         oldGen.format match {
